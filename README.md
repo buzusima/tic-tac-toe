@@ -50,7 +50,7 @@
 
 ## Detailing
 ### Fully game logic
-- tic tac toe component only with win/lose/drawing trigger 
+- tic tac toe component only with win/lose/drawing trigger [D]
 - point collector
 - botting
 - accounting (OAuth)
