@@ -60,7 +60,7 @@
 ## Detailing
 ### Fully game logic
 - tic tac toe component only with win/lose/drawing trigger [D]
-- botting (Random select)
+- botting (Random select) [D]
 - point collector
 - accounting (OAuth)
     - Multiple account

@@ -1,63 +1,59 @@
-import { get, writable } from 'svelte/store'
+import {
+    addBotPoint,
+    addPlayerPoint,
+    createGameByPlayerId,
+    getGameByPlayerId,
+    minusPlayerPoint,
+} from '../datasources/local-storage/game'
+import { createGameConfigByPlayerId, getGameConfigByPlayerId } from '../datasources/local-storage/game-config'
+import { BotLevel } from './bot.svelte'
 
-export enum GamePlayerEnum {
+export enum PlayerType {
     PLAYER = 'X',
     BOT = 'O',
     EMPTY = '',
 }
 
-export const CONSECUTIVE_TARGET = 3
-
-export let playerPoint = writable(0)
-export let botPoint = writable(0)
-export let consecutiveWins = writable(0)
-
-//TODO: Implement datasource
-
-export const getGame = async (playId: string): Promise<GameResponse> => {
-    return Promise.resolve({
-        id: 'string',
-        playerPoint: 10,
-        playerNumberOfConsecutiveWins: 2,
-        botPoint: 5,
-    })
+const DEFAULT_GAME_CONFIG: GameConfigResponse = {
+    consecutiveTarget: 3,
+    botLevel: BotLevel.EASY,
 }
 
-export const processConsecutiveWin = (player: GamePlayerEnum) => {
-    if (!player) return
-    
-    if (player === GamePlayerEnum.PLAYER) {
-        consecutiveWins.update((n) => n + 1)
+export const getGame = (playerId: string): Promise<GameResponse> => {
+    try {
+        return getGameByPlayerId(playerId)
+    } catch (error) {
+        return createGameByPlayerId(playerId)
+    }
+}
+
+export const getGameConfig = (playerId: string): Promise<GameConfigResponse> => {
+    try {
+        return getGameConfigByPlayerId(playerId)
+    } catch (error) {
+        return createGameConfigByPlayerId(playerId, DEFAULT_GAME_CONFIG.consecutiveTarget, DEFAULT_GAME_CONFIG.botLevel)
+    }
+}
+
+export const processPoint = async (gameId: string, playerType: PlayerType): Promise<GameResponse> => {
+    if (!playerType) return
+
+    if (playerType === PlayerType.PLAYER) {
+        return addPlayerPoint(gameId)
     } else {
-        consecutiveWins.set(0)
+        await addBotPoint(gameId)
+        return minusPlayerPoint(gameId)
     }
 }
 
-export const processPoint = (player: GamePlayerEnum) => {
-    if (!player) return
-
-    if (player === GamePlayerEnum.PLAYER) {
-        playerPoint.update((point) => point + 1)
-
-        addBonusIfReachConsecutiveTargetAndReset()
-    } else {
-        botPoint.update((point) => point + 1)
-        if (get(playerPoint) > 0) playerPoint.update((point) => point - 1)
-    }
+export interface GameConfigResponse {
+    consecutiveTarget: number
+    botLevel: number
 }
-
-const addBonusIfReachConsecutiveTargetAndReset = () => {
-    if (CONSECUTIVE_TARGET == get(consecutiveWins)) {
-        playerPoint.update((point) => point + 1)
-
-        consecutiveWins.set(0)
-    }
-}
-
-export interface AddPointRequest {}
 
 export interface GameResponse {
     id: string
+    playerId: string
     playerPoint: number
     playerNumberOfConsecutiveWins: number
     botPoint: number

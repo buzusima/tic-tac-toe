@@ -1,35 +1,35 @@
 <script lang="ts">
     import { createEventDispatcher, onMount } from 'svelte'
     import { fade } from 'svelte/transition'
-    import type { RandomBot } from '../../bots/random'
-    import { GamePlayerEnum } from '../../services/game.svelte'
+    import type { Bot } from '../../services/bot.svelte'
+    import { PlayerType } from '../../services/game.svelte'
 
     export let gameSize = 3
-    export let bot: RandomBot
-    export let currentPlayer: GamePlayerEnum = GamePlayerEnum.PLAYER
+    export let bot: Bot
+    export let currentPlayer: PlayerType = PlayerType.PLAYER
 
     export const resetBoard = async () => {
         gameBoard = generateBoard(gameSize)
         gameFreezed = false
         winner = undefined
         winnerCombination = undefined
-        currentPlayer = GamePlayerEnum.PLAYER
+        currentPlayer = PlayerType.PLAYER
     }
 
     const dispatch = createEventDispatcher()
 
     let winningCombinations: number[][][]
 
-    let gameBoard: GamePlayerEnum[][]
+    let gameBoard: PlayerType[][]
     let gameFreezed = false
-    let winner: GamePlayerEnum | undefined
+    let winner: PlayerType | undefined
     let winnerCombination: number[][] | undefined
 
-    const generateBoard = (size: number): GamePlayerEnum[][] => {
-        const board: GamePlayerEnum[][] = []
+    const generateBoard = (size: number): PlayerType[][] => {
+        const board: PlayerType[][] = []
 
         for (let i = 0; i < size; i++) {
-            const row = new Array(size).fill(GamePlayerEnum.EMPTY)
+            const row = new Array(size).fill(PlayerType.EMPTY)
             board.push(row)
         }
 
@@ -74,33 +74,33 @@
         return combinations
     }
 
-    const checkWinner = (board: GamePlayerEnum[][], player: GamePlayerEnum): GamePlayerEnum | undefined => {
+    const checkWinner = (board: PlayerType[][], playerType: PlayerType): PlayerType | undefined => {
         winnerCombination = winningCombinations.find((combination) =>
-            combination.every(([x, y]) => board[x][y] === player)
+            combination.every(([x, y]) => board[x][y] === playerType)
         )
-        return winnerCombination ? player : undefined
+        return winnerCombination ? playerType : undefined
     }
 
-    const isDraw = (board: GamePlayerEnum[][]): boolean =>
-        board.every((row) => row.every((cell) => cell !== GamePlayerEnum.EMPTY))
+    const isDraw = (board: PlayerType[][]): boolean =>
+        board.every((row) => row.every((cell) => cell !== PlayerType.EMPTY))
 
-    const switchPlayer = (player: GamePlayerEnum) =>
-        player == GamePlayerEnum.PLAYER ? GamePlayerEnum.BOT : GamePlayerEnum.PLAYER
+    const switchPlayer = (playerType: PlayerType) =>
+        playerType == PlayerType.PLAYER ? PlayerType.BOT : PlayerType.PLAYER
 
-    const botTurn = async (board: GamePlayerEnum[][]) => {
+    const botTurn = async (board: PlayerType[][]) => {
         gameFreezed = true
         await new Promise((f) => setTimeout(f, 500)) // Bot think
         gameFreezed = false
 
         const [rowIndex, colIndex] = bot.selectCell(board)
-        gameBoard[rowIndex][colIndex] = GamePlayerEnum.BOT
+        gameBoard[rowIndex][colIndex] = PlayerType.BOT
 
         processAfterCellClick()
     }
 
     const handleOnCellClick = (rowIndex: number, colIndex: number) => {
-        if (gameBoard && gameBoard[rowIndex][colIndex] === GamePlayerEnum.EMPTY && !gameFreezed) {
-            gameBoard[rowIndex][colIndex] = GamePlayerEnum.PLAYER
+        if (gameBoard && gameBoard[rowIndex][colIndex] === PlayerType.EMPTY && !gameFreezed) {
+            gameBoard[rowIndex][colIndex] = PlayerType.PLAYER
 
             processAfterCellClick()
         }
@@ -119,7 +119,7 @@
                 dispatch('gameEnd')
             } else {
                 currentPlayer = switchPlayer(currentPlayer)
-                if (currentPlayer === GamePlayerEnum.BOT) botTurn(gameBoard)
+                if (currentPlayer === PlayerType.BOT) botTurn(gameBoard)
             }
         }
     }
@@ -142,7 +142,7 @@
                             const col = element[1]
                             return row == rowIndex && col == colIndex
                         })
-                            ? winner === GamePlayerEnum.PLAYER
+                            ? winner === PlayerType.PLAYER
                                 ? 'player-win'
                                 : 'bot-win'
                             : ''}"

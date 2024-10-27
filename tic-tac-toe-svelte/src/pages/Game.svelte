@@ -1,93 +1,111 @@
 <script lang="ts">
     import { onMount } from 'svelte'
     import { fade } from 'svelte/transition'
-    import { RandomBot } from '../bots/random'
     import Board from '../components/game/Board.svelte'
+    import { getBot, type Bot } from '../services/bot.svelte'
     import {
-        botPoint,
-        CONSECUTIVE_TARGET,
-        consecutiveWins,
-        GamePlayerEnum,
-        playerPoint,
-        processConsecutiveWin,
+        getGame,
+        getGameConfig,
+        PlayerType,
         processPoint,
+        type GameConfigResponse,
+        type GameResponse,
     } from '../services/game.svelte'
 
     const GAME_SIZE = 3
+    const MOCK_PLAYER_ID = 'MOCK_PLAYER_ID'
 
     let board: Board
-    let bot: RandomBot
+    let bot: Bot
 
     let gameEnd = false
-    let currentPlayer: GamePlayerEnum = GamePlayerEnum.PLAYER
-    let winner: GamePlayerEnum = GamePlayerEnum.EMPTY
-    let bonus = false
+    let currentPlayer: PlayerType = PlayerType.PLAYER
+    let winner: PlayerType = PlayerType.EMPTY
 
-    const handleOnGameEnd = (event: any) => {
+    let getGameConfigFunction: Promise<GameConfigResponse>
+    let getGameFunction: Promise<GameResponse>
+
+    let gameConfig: GameConfigResponse
+    let game: GameResponse
+
+    const handleOnGameEnd = async (event: any) => {
         gameEnd = true
         winner = event.detail
 
-        processConsecutiveWin(winner)
-        if ($consecutiveWins == CONSECUTIVE_TARGET) {
-            bonus = true
-        }
-
-        processPoint(winner)
+        game = await processPoint(game.id, winner)
     }
 
-    onMount(() => {
-        //TODO: Read from game config
-        bot = new RandomBot()
+    onMount(async () => {
+        getGameConfigFunction = getGameConfig(MOCK_PLAYER_ID)
+        getGameFunction = getGame(MOCK_PLAYER_ID)
+
+        try {
+            gameConfig = await getGameConfigFunction
+            game = await getGameFunction
+
+            if (gameConfig) bot = getBot(gameConfig.botLevel)
+        } catch (error) {
+            console.error(error)
+        }
     })
 </script>
 
-<div class="game-panel">
-    <div>
-        <div class="player-status-container">
-            Player ({GamePlayerEnum.PLAYER})
-            <div class="player-point-container {winner === GamePlayerEnum.PLAYER ? 'win' : ''}">
-                {#key $playerPoint}
-                    Point: <span in:fade={{ duration: 1000 }}>{$playerPoint}</span>
-                {/key}
+{#await getGameConfigFunction then}
+    {#await getGameFunction then}
+        <div class="game-panel">
+            <div>
+                {#if game}
+                    <div class="player-status-container">
+                        Player ({PlayerType.PLAYER})
+                        <div class="player-point-container {winner === PlayerType.PLAYER ? 'win' : ''}">
+                            {#key game.playerPoint}
+                                Point: <span in:fade={{ duration: 1000 }}>{game.playerPoint}</span>
+                            {/key}
 
-                <div class="consecutive-container">
-                    Consecutive Wins:
-                    {#each { length: $consecutiveWins } as _, i}
-                        <div class="consecutive-current" in:fade></div>
-                    {/each}
+                            <div class="consecutive-container">
+                                Consecutive Wins:
+                                {#each { length: game.playerNumberOfConsecutiveWins } as _, i}
+                                    <div class="consecutive-current" in:fade></div>
+                                {/each}
 
-                    {#each { length: CONSECUTIVE_TARGET - $consecutiveWins } as _, i}
-                        <div class="consecutive-target"></div>
-                    {/each}
-                </div>
+                                {#if gameConfig}
+                                    {#each { length: gameConfig.consecutiveTarget - game.playerNumberOfConsecutiveWins } as _, i}
+                                        <div class="consecutive-target"></div>
+                                    {/each}
+                                {/if}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bot-status-container">
+                        <span>
+                            Bot ({PlayerType.BOT})
+                        </span>
+                        <div class="bot-point-container {winner === PlayerType.BOT ? 'win' : ''}">
+                            Point: {game.botPoint}
+                        </div>
+                    </div>
+                {/if}
+            </div>
+
+            <div class="board-container">
+                <Board bind:this={board} gameSize={GAME_SIZE} {bot} bind:currentPlayer on:gameEnd={handleOnGameEnd} />
+            </div>
+
+            <div class="control">
+                {#if gameEnd}
+                    <button
+                        onclick={() => {
+                            gameEnd = false
+                            winner = PlayerType.EMPTY
+                            board.resetBoard()
+                        }}
+                        in:fade>Play Again</button
+                    >
+                {/if}
             </div>
         </div>
-        <div class="bot-status-container">
-            <span>
-                Bot ({GamePlayerEnum.BOT})
-            </span>
-            <div class="bot-point-container {winner === GamePlayerEnum.BOT ? 'win' : ''}">Point: {$botPoint}</div>
-        </div>
-    </div>
-
-    <div class="board-container">
-        <Board bind:this={board} gameSize={GAME_SIZE} {bot} bind:currentPlayer on:gameEnd={handleOnGameEnd} />
-    </div>
-
-    <div class="control">
-        {#if gameEnd}
-            <button
-                onclick={() => {
-                    gameEnd = false
-                    winner = GamePlayerEnum.EMPTY
-                    bonus = false
-                    board.resetBoard()
-                }}
-                in:fade>Play Again</button
-            >
-        {/if}
-    </div>
-</div>
+    {/await}
+{/await}
 
 <style>
     .game-panel {
@@ -96,7 +114,7 @@
         align-items: center;
 
         .player-status-container {
-            color:lightgreen;
+            color: lightgreen;
 
             .player-point-container {
                 border: 0.125rem solid gray;
