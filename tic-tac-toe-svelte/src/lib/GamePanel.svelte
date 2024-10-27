@@ -1,17 +1,14 @@
 <script lang="ts">
     import { onMount } from 'svelte'
-
-    enum GamePlayerEnum {
-        PLAYER = 'X',
-        BOT = 'O',
-        EMPTY = '',
-    }
+    import { RandomBot } from '../services/bot-random.svelte'
+    import { GamePlayerEnum } from '../services/game-play.svelte'
 
     const GAME_SIZE = 3
 
     let gameBoard: GamePlayerEnum[][]
     let winningCombinations: number[][][]
     let currentPlayer: GamePlayerEnum = GamePlayerEnum.PLAYER
+    let bot: RandomBot //TODO change to Bot interface to serve AI bot
 
     const generateBoard = (size: number): GamePlayerEnum[][] => {
         const board: GamePlayerEnum[][] = []
@@ -71,20 +68,32 @@
     const switchPlayer = (player: GamePlayerEnum) =>
         player == GamePlayerEnum.PLAYER ? GamePlayerEnum.BOT : GamePlayerEnum.PLAYER
 
-    const handleOnSqureClick = (rowIndex: number, colIndex: number) => {
+    const botTurn = async () => {
+        await new Promise((f) => setTimeout(f, 500)) // Bot think
+        const [rowIndex, colIndex] = bot.selectCell(gameBoard)
+
+        gameBoard[rowIndex][colIndex] = currentPlayer
+        processAfterCellSelected()
+    }
+
+    const handleOnCellClick = (rowIndex: number, colIndex: number) => {
         if (gameBoard[rowIndex][colIndex] === GamePlayerEnum.EMPTY) {
             gameBoard[rowIndex][colIndex] = currentPlayer
+            processAfterCellSelected()
+        }
+    }
 
-            const hasWinner = checkWinner(gameBoard, currentPlayer)
-            if (hasWinner) {
-                alert(`${currentPlayer} win!!`)
+    const processAfterCellSelected = () => {
+        const hasWinner = checkWinner(gameBoard, currentPlayer)
+        if (hasWinner) {
+            alert(`${currentPlayer} win!!`)
+        } else {
+            const draw = isDraw(gameBoard)
+            if (draw) {
+                alert(`draw!!`)
             } else {
-                const draw = isDraw(gameBoard)
-                if (draw) {
-                    alert(`draw!!`)
-                } else {
-                    currentPlayer = switchPlayer(currentPlayer)
-                }
+                currentPlayer = switchPlayer(currentPlayer)
+                if (currentPlayer === GamePlayerEnum.BOT) botTurn()
             }
         }
     }
@@ -92,6 +101,7 @@
     onMount(() => {
         gameBoard = generateBoard(GAME_SIZE)
         winningCombinations = generateWinningCombinations(GAME_SIZE)
+        bot = new RandomBot()
     })
 </script>
 
@@ -99,7 +109,7 @@
     {#each gameBoard as row, rowIndex}
         <div class="row">
             {#each row as cell, colIndex}
-                <button class="cell" type="button" onclick={() => handleOnSqureClick(rowIndex, colIndex)}>
+                <button class="cell" type="button" onclick={() => handleOnCellClick(rowIndex, colIndex)}>
                     {cell}
                 </button>
             {/each}

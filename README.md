@@ -20,6 +20,7 @@
 ## Big picture
 - MVP
     - Fully game logic
+    - Bot random select
     - Local storage datasource
     - OAuth
     - Run by script
@@ -41,18 +42,26 @@
         - OAuth
     - Run by script
     - Cypress with run srcipt
+- MVP + C + Browser storage + DB + Docker
+    - Fully game logic
+        - Every browser datasource + DB
+        - OAuth
+    - Run by docker
+    - Cypress with run srcipt
 - Full
     - Fully game logic
         - Every browser datasource + DB
         - OAuth
     - Run by docker
+    - Bot selector
+    - Game size config
     - Cypress may run after service start if posible
 
 ## Detailing
 ### Fully game logic
 - tic tac toe component only with win/lose/drawing trigger [D]
+- botting (Random select)
 - point collector
-- botting
 - accounting (OAuth)
     - Multiple account
 - Continue reset logic
@@ -67,3 +76,9 @@
 - Unit testing with run before build
 ### Docker build 
 - Docker file with datasource config
+
+### Future
+- bot levels
+    - easy (Random bot)
+    - medium (Logic bot)
+    - hard (AI bot)
