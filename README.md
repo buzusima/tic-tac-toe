@@ -5,7 +5,6 @@
 ## TODO
 - Frontend
     - Svelte
-    - SASS
     - Each datasource config same interface
     - Each element support cypress
 - Backend
@@ -51,8 +50,9 @@
 
 ## Detailing
 ### Fully game logic
-- tic tac toe component only with win/lose trigger
+- tic tac toe component only with win/lose/drawing trigger 
 - point collector
+- botting
 - accounting (OAuth)
     - Multiple account
 - Continue reset logic
