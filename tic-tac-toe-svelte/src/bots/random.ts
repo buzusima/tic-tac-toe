@@ -1,4 +1,4 @@
-import { GamePlayerEnum } from './game-play.svelte'
+import { GamePlayerEnum } from '../services/game.svelte'
 
 export class RandomBot {
     private getEmptyCell = (board: GamePlayerEnum[][]) => {

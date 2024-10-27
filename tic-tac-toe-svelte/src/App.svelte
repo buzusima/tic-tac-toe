@@ -1,9 +1,9 @@
 <script lang="ts">
-    import GamePanel from './lib/GamePanel.svelte'
+    import Game from './pages/Game.svelte'
 </script>
 
 <main>
-    <GamePanel />
+    <Game />
 </main>
 
 <style>
