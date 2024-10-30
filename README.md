@@ -1,105 +1,36 @@
+# Tic Tac Toe
+This game mode features Player vs. Bot only. The player is designated as "X," and the bot is designated as "O."
+
+### Prerequisite
+The game uses an OAuth login system, requiring players to sign in using Google. To enable this feature, obtain the GOOGLE_CLIENT_ID from Google and add it to the configuration file before running the game.
+
+For guidance on obtaining the GOOGLE_CLIENT_ID, please follow this link: https://support.google.com/cloud/answer/6158849?hl=en
+
+### Game Logic
+    if player win
+        playerPoint++
+        consecutiveWin++
+        if Player consecutiveWin == 3
+            playerPoint++
+            consecutiveWin = 0
+    else if bot win
+        botPoint++
+        playerPoint--
+        consecutiveWin = 0
+    else (draw)
+        consecutiveWin = 0
+
 # Get Started
+1. npm install
+2. Go to vite.config.ts and put the GOOGLE_CLIENT_ID into '' in OAUTH_GOOGLE_CLIENT_ID: JSON.stringify('')
+3. npm run dev
 
-
-
-## TODO
-- Frontend
-    - Svelte
-    - Each datasource config same interface
-    - Each element support cypress
-- Backend
-    - ExpressJs
-    - Typeorm
-    - Unit test
-- Cypress
-- Docker build
-    - Datasource config is require input
-        - if not db, no backend run
-
-
-## Big picture
-- MVP
-    - Fully game logic
-    - Bot random select
-    - Local storage datasource
-    - OAuth
-    - Run by script
-- MVP + C
-    - Fully game logic
-        - Local storage datasource
-        - OAuth
-    - Run by script
-    - Cypress with run srcipt
-- MVP + C + Browser storage
-    - Fully game logic
-        - Every browser datasource
-        - OAuth
-    - Run by script
-    - Cypress with run srcipt
-- MVP + C + Browser storage + DB
-    - Fully game logic
-        - Every browser datasource + DB
-        - OAuth
-    - Run by script
-    - Cypress with run srcipt
-- MVP + C + Browser storage + DB + Docker
-    - Fully game logic
-        - Every browser datasource + DB
-        - OAuth
-    - Run by docker
-    - Cypress with run srcipt
-- Full
-    - Fully game logic
-        - Every browser datasource + DB
-        - OAuth
-    - Run by docker
-    - Bot selector
-    - Game size config
-    - Cypress may run after service start if posible
-
-## Detailing
-### Fully game logic
-- tic tac toe component only with win/lose/drawing trigger [D]
-- botting (Random select) [D]
-- point collector 
-- accounting (OAuth)
-    - Multiple account
-- Continue reset logic
-- Decorate
-### Cypress
-- Test case create to each cypress file
-- Implement each test case
-### Browser storage
-- Implement each browser storage
-### DB storage
-- Express with SQLite
-- Unit testing with run before build
-### Docker build 
-- Docker file with datasource config
-
-### Future
-- bot levels
-    - easy (Random bot)
-    - medium (Logic bot)
-    - hard (AI bot)
-
-
-# TODO
-- Profile display [D]
-- Logout [D]
-- Fix new user cannot create new game [D]
-- Alert modal [D]
-- Oath config [D]
-- Support multiple datasource [D]
-- Bot interface [D]
-- Logic Bot
-- Testing
-    - local storage test
-    - game win/lose/draw test
-    - bot test
-- Document
-    - Flowchart
-    - Deployment
-- Recheck code
-- Merge branch
-- Game setting
+# Disclaimer
+This project is currently at the MVP (Minimum Viable Product) stage. Planned features and improvements include:
+1. Unit testing
+2. Game history
+3. Adjustable game size
+4. Bot difficulty levels
+5. Backend server integration with an SQLite database
+6. Docker setup
+7. UI Improvements
