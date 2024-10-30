@@ -2,10 +2,12 @@ import {
     addBotPoint,
     addPlayerPoint,
     createGameByPlayerId,
+    createGameConfigByPlayerId,
     getGameByPlayerId,
+    getGameConfigByPlayerId,
     minusPlayerPoint,
-} from '../datasources/local-storage/game'
-import { createGameConfigByPlayerId, getGameConfigByPlayerId } from '../datasources/local-storage/game-config'
+    resetPlayerNumberOfConsecutiveWins,
+} from '../datasources/data-provider'
 import { BotLevel } from './bot.svelte'
 
 export enum PlayerType {
@@ -19,30 +21,38 @@ const DEFAULT_GAME_CONFIG: GameConfigResponse = {
     botLevel: BotLevel.EASY,
 }
 
-export const getGame = (playerId: string): Promise<GameResponse> => {
+export const getGame = async (playerId: string): Promise<GameResponse> => {
+    let game: GameResponse
     try {
-        return getGameByPlayerId(playerId)
+        game = await getGameByPlayerId(playerId)
     } catch (error) {
-        return createGameByPlayerId(playerId)
+        game = await createGameByPlayerId(playerId)
     }
+    return game
 }
 
-export const getGameConfig = (playerId: string): Promise<GameConfigResponse> => {
+export const getGameConfig = async (playerId: string): Promise<GameConfigResponse> => {
+    let gameConfig: GameConfigResponse
     try {
-        return getGameConfigByPlayerId(playerId)
+        gameConfig = await getGameConfigByPlayerId(playerId)
     } catch (error) {
-        return createGameConfigByPlayerId(playerId, DEFAULT_GAME_CONFIG.consecutiveTarget, DEFAULT_GAME_CONFIG.botLevel)
+        gameConfig = await createGameConfigByPlayerId(
+            playerId,
+            DEFAULT_GAME_CONFIG.consecutiveTarget,
+            DEFAULT_GAME_CONFIG.botLevel
+        )
     }
+    return gameConfig
 }
 
 export const processPoint = async (gameId: string, playerType: PlayerType): Promise<GameResponse> => {
-    if (!playerType) return
-
     if (playerType === PlayerType.PLAYER) {
         return addPlayerPoint(gameId)
-    } else {
+    } else if (playerType === PlayerType.BOT) {
         await addBotPoint(gameId)
         return minusPlayerPoint(gameId)
+    } else {
+        return resetPlayerNumberOfConsecutiveWins(gameId)
     }
 }
 

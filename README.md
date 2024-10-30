@@ -61,7 +61,7 @@
 ### Fully game logic
 - tic tac toe component only with win/lose/drawing trigger [D]
 - botting (Random select) [D]
-- point collector
+- point collector 
 - accounting (OAuth)
     - Multiple account
 - Continue reset logic
@@ -82,3 +82,24 @@
     - easy (Random bot)
     - medium (Logic bot)
     - hard (AI bot)
+
+
+# TODO
+- Profile display [D]
+- Logout [D]
+- Fix new user cannot create new game [D]
+- Alert modal [D]
+- Oath config [D]
+- Support multiple datasource [D]
+- Bot interface [D]
+- Logic Bot
+- Testing
+    - local storage test
+    - game win/lose/draw test
+    - bot test
+- Document
+    - Flowchart
+    - Deployment
+- Recheck code
+- Merge branch
+- Game setting

@@ -10,13 +10,13 @@ export enum BotLevel {
 export const getBot = (botLevel: BotLevel): Bot => {
     switch (botLevel) {
         case BotLevel.EASY:
-            return new RandomBot()
+            return RandomBot
         case BotLevel.MEDIUM:
         // return new LogicBot()
         case BotLevel.HARD:
         // return new AiBot()
         default:
-            return new RandomBot()
+            return RandomBot
     }
 }
 

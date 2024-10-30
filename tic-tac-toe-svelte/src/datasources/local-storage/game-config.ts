@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid'
 import { BotLevel } from '../../services/bot.svelte'
+import type { GameConfig, GameConfigDataProvider } from '../data-provider'
 
 const GAME_CONFIGS_KEY = 'game-configs'
 
@@ -8,39 +9,41 @@ const getGameConfigs = () => localStorage.getItem(GAME_CONFIGS_KEY)
 const setGameConfigs = (gameConfigs: GameConfig[]) =>
     localStorage.setItem(GAME_CONFIGS_KEY, JSON.stringify(gameConfigs))
 
-export const getGameConfigByPlayerId = (playerId: string): Promise<GameConfig> => {
-    const gameConfigsJson = getGameConfigs()
+export const localGameConfigConnector: GameConfigDataProvider = {
+    getGameConfigByPlayerId: (playerId: string): Promise<GameConfig> => {
+        const gameConfigsJson = getGameConfigs()
 
-    let gameConfigs: GameConfig[]
-    if (gameConfigsJson) gameConfigs = JSON.parse(gameConfigsJson)
-    if (!gameConfigs) Promise.reject('Game config not found')
+        let gameConfigs: GameConfig[] | undefined
+        if (gameConfigsJson) gameConfigs = JSON.parse(gameConfigsJson)
+        if (!gameConfigs) return Promise.reject(new Error('Game config not found'))
 
-    const gameConfig = findGameConfigByPlayerId(gameConfigs, playerId)
+        const gameConfig = findGameConfigByPlayerId(gameConfigs, playerId)
 
-    if (gameConfig) return Promise.resolve(gameConfig)
-    else Promise.reject('Game config not found')
-}
+        if (gameConfig) return Promise.resolve(gameConfig)
+        else return Promise.reject(new Error('Game config not found'))
+    },
+    
+    createGameConfigByPlayerId: (
+        playerId: string,
+        consecutiveTarget: number,
+        botLevel: BotLevel
+    ): Promise<GameConfig> => {
+        let gameConfigs = findAllGameConfigs()
+        if (!gameConfigs) gameConfigs = []
 
-export const createGameConfigByPlayerId = (
-    playerId: string,
-    consecutiveTarget: number,
-    botLevel: BotLevel
-): Promise<GameConfig> => {
-    let gameConfigs = findAllGameConfigs()
-    if (!gameConfigs) gameConfigs = []
+        const newGameConfig: GameConfig = {
+            id: uuidv4(),
+            playerId: playerId,
+            consecutiveTarget: consecutiveTarget,
+            botLevel: botLevel,
+        }
 
-    const newGameConfig: GameConfig = {
-        id: uuidv4(),
-        playerId: playerId,
-        consecutiveTarget: consecutiveTarget,
-        botLevel: botLevel,
-    }
+        gameConfigs.push(newGameConfig)
 
-    gameConfigs.push(newGameConfig)
+        setGameConfigs(gameConfigs)
 
-    setGameConfigs(gameConfigs)
-
-    return Promise.resolve(newGameConfig)
+        return Promise.resolve(newGameConfig)
+    },
 }
 
 const findAllGameConfigs = (): GameConfig[] => {
@@ -53,10 +56,3 @@ const findAllGameConfigs = (): GameConfig[] => {
 
 const findGameConfigByPlayerId = (gameConfigs: GameConfig[], playerId: string): GameConfig =>
     gameConfigs.find((gameConfig) => gameConfig.playerId == playerId)
-
-interface GameConfig {
-    id: string
-    playerId: string
-    consecutiveTarget: number
-    botLevel: number
-}

@@ -1,21 +1,23 @@
+import type { Bot } from '../services/bot.svelte'
 import { PlayerType } from '../services/game.svelte'
 
-export class RandomBot {
-    private getEmptyCell = (board: PlayerType[][]) => {
-        let emptyCells = []
-        for (const [rowIndex, row] of board.entries()) {
-            for (const [colIndex, cell] of row.entries()) {
-                if (cell === PlayerType.EMPTY) emptyCells.push([rowIndex, colIndex])
-            }
-        }
-        return emptyCells
-    }
+export const RandomBot: Bot = {
+    selectCell: (board: PlayerType[][]): [number, number] => {
+        const emptyCells = getEmptyCell(board)
+        const selectedCell = emptyCells[randomIndex(emptyCells.length)]
 
-    private randomIndex = (indexSize: number): number => Math.floor(Math.random() * indexSize)
-
-    selectCell = (board: PlayerType[][]): [number, number] => {
-        const emptyCells = this.getEmptyCell(board)
-
-        return emptyCells[this.randomIndex(emptyCells.length)]
-    }
+        return [selectedCell[0], selectedCell[1]]
+    },
 }
+
+const getEmptyCell = (board: PlayerType[][]) => {
+    let emptyCells = []
+    for (const [rowIndex, row] of board.entries()) {
+        for (const [colIndex, cell] of row.entries()) {
+            if (cell === PlayerType.EMPTY) emptyCells.push([rowIndex, colIndex])
+        }
+    }
+    return emptyCells
+}
+
+const randomIndex = (indexSize: number): number => Math.floor(Math.random() * indexSize)

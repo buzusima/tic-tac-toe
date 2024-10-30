@@ -2,11 +2,12 @@
     import { createEventDispatcher, onMount } from 'svelte'
     import { fade } from 'svelte/transition'
     import type { Bot } from '../../services/bot.svelte'
-    import { PlayerType } from '../../services/game.svelte'
+    import { PlayerType, type GameConfigResponse, type GameResponse } from '../../services/game.svelte'
 
+    export let game: GameResponse
+    export let gameConfig: GameConfigResponse
     export let gameSize = 3
     export let bot: Bot
-    export let currentPlayer: PlayerType = PlayerType.PLAYER
 
     export const resetBoard = async () => {
         gameBoard = generateBoard(gameSize)
@@ -24,6 +25,7 @@
     let gameFreezed = false
     let winner: PlayerType | undefined
     let winnerCombination: number[][] | undefined
+    let currentPlayer: PlayerType = PlayerType.PLAYER
 
     const generateBoard = (size: number): PlayerType[][] => {
         const board: PlayerType[][] = []
@@ -106,17 +108,35 @@
         }
     }
 
-    const processAfterCellClick = () => {
+    const alertAndResetBoard = async (message: string) => {
+        await new Promise((f) => setTimeout(f, 250))
+        alert(message)
+        resetBoard()
+    }
+
+    const processAfterCellClick = async () => {
         winner = checkWinner(gameBoard, currentPlayer)
 
         if (winner) {
             gameFreezed = true
             dispatch('gameEnd', currentPlayer)
+
+            if (currentPlayer === PlayerType.PLAYER) {
+                alertAndResetBoard(
+                    game.playerNumberOfConsecutiveWins + 1 == gameConfig.consecutiveTarget
+                        ? 'Congraturation!, you got 1 bonus point, so the point has been +2 ^^'
+                        : 'You win!, the point has been +1'
+                )
+            } else {
+                alertAndResetBoard(game.playerPoint > 0 ? 'You lose!, the point has been -1' : 'You lose!')
+            }
         } else {
             const draw = isDraw(gameBoard)
             if (draw) {
                 gameFreezed = true
                 dispatch('gameEnd')
+
+                alertAndResetBoard('Draw!')
             } else {
                 currentPlayer = switchPlayer(currentPlayer)
                 if (currentPlayer === PlayerType.BOT) botTurn(gameBoard)
