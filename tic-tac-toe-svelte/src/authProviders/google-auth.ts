@@ -1,24 +1,25 @@
 import { processAfterGoogleLogin, type GoogleAccountProfile } from '../services/player.svelte'
 
-export function initializeGoogle(clientId: string, callback: any) {
+export const initializeGoogle = (clientId: string, renderButtonId: string) => {
     const script = document.createElement('script')
     script.src = 'https://accounts.google.com/gsi/client'
     script.onload = () => {
-        google.accounts.id.initialize({
-            client_id: clientId,
-            callback,
-        })
+        if (google) {
+            google.accounts.id.initialize({
+                client_id: '239037799158-bbtqtrfia9ahta330tlesa0ktpj1cr9u.apps.googleusercontent.com',
+                callback: handleGoogleCredential,
+            })
+            const googleButton = document.getElementById(renderButtonId)
+            if (googleButton) google.accounts.id.renderButton(googleButton, { theme: 'outline', size: 'large' })
+            // google.accounts.id.prompt()
+        }
     }
     document.body.appendChild(script)
 }
 
-export function renderGoogleButton(buttonId: string) {
-    google.accounts.id.renderButton(document.getElementById(buttonId), { theme: 'outline', size: 'large' })
-}
-
-export function handleGoogleCredential(response: any) {
+const handleGoogleCredential = (response: any): void => {
     const accountProfile: GoogleAccountProfile = jwt_decode(response.credential)
-    
+
     processAfterGoogleLogin(accountProfile)
 }
 
@@ -35,4 +36,14 @@ const jwt_decode = (token: string) => {
     )
 
     return JSON.parse(jsonPayload)
+}
+
+declare namespace google {
+    namespace accounts {
+        namespace id {
+            function initialize(options: { client_id: string; callback: (response: any) => void }): void;
+            function renderButton(element: HTMLElement, options: { theme: string; size: string }): void;
+            function prompt(): void;
+        }
+    }
 }

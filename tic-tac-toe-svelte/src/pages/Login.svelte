@@ -1,37 +1,46 @@
 <script lang="ts">
-    import { onMount } from 'svelte'
-    import { authProviders } from '../authProviders/auth'
-    import { getPlayerProfile, playerProfile } from '../services/player.svelte'
+    import { onMount } from "svelte";
+    import { authProviders } from "../authProviders/auth";
+    import { getPlayerProfile, playerProfile } from "../services/player.svelte";
 
-    const GOOGLE_CLIENT_ID = process.env.OAUTH_GOOGLE_CLIENT_ID
+    const GOOGLE_CLIENT_ID = import.meta.env.OAUTH_GOOGLE_CLIENT_ID;
 
     onMount(() => {
-        const pProfile = getPlayerProfile()
+        const pProfile = getPlayerProfile();
         if (pProfile) {
-            playerProfile.set(pProfile)
+            playerProfile.set(pProfile);
         } else {
             if (GOOGLE_CLIENT_ID)
-                authProviders.google.initialize(GOOGLE_CLIENT_ID, authProviders.google.handleCredential)
-            authProviders.google.renderButton('signInButton')
+                authProviders.google.initialize(
+                    GOOGLE_CLIENT_ID,
+                    "signInButton",
+                );
         }
-    })
+    });
 </script>
 
 <div class="login-page">
     <div class="login-content">
         <h1 class="tic-tac-toe-title">Welcome to Tic Tac Toe Arena!</h1>
         <p>
-            Log in to save your game profile, track your scores, and aim for consecutive wins! Achieve three consecutive
-            wins to earn a bonus point, then watch as your streak resets to start the challenge again.
+            Log in to save your game profile, track your scores, and aim for
+            consecutive wins! Achieve three consecutive wins to earn a bonus
+            point, then watch as your streak resets to start the challenge
+            again.
         </p>
         <p>
-            Ready to become the ultimate Tic Tac Toe champion? <strong>Sign in now</strong> to start recording your progress!
+            Ready to become the ultimate Tic Tac Toe champion? <strong
+                >Sign in now</strong
+            > to start recording your progress!
         </p>
         <div class="sign-in-button">
             {#if GOOGLE_CLIENT_ID}
                 <div id="signInButton"></div>
             {:else}
-                <h1 class="text-red-color">Cannot login! No provider config, please check the config file.</h1>
+                <h1 class="text-red-color">
+                    Cannot login! No provider config, please check the config
+                    file.
+                </h1>
             {/if}
         </div>
     </div>
