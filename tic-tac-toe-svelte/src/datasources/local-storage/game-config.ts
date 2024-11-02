@@ -6,20 +6,20 @@ const GAME_CONFIGS_KEY = 'game-configs'
 
 const getGameConfigs = () => localStorage.getItem(GAME_CONFIGS_KEY)
 
-const setGameConfigs = (gameConfigs: GameConfig[]) =>
-    localStorage.setItem(GAME_CONFIGS_KEY, JSON.stringify(gameConfigs))
+const setGameConfigs = (gameSettings: GameConfig[]) =>
+    localStorage.setItem(GAME_CONFIGS_KEY, JSON.stringify(gameSettings))
 
 export const localGameConfigConnector: GameConfigDataProvider = {
     getGameConfigByPlayerId: (playerId: string): Promise<GameConfig> => {
-        const gameConfigsJson = getGameConfigs()
+        const gameSettingsJson = getGameConfigs()
 
-        let gameConfigs: GameConfig[] | undefined
-        if (gameConfigsJson) gameConfigs = JSON.parse(gameConfigsJson)
-        if (!gameConfigs) return Promise.reject(new Error('Game config not found'))
+        let gameSettings: GameConfig[] | undefined
+        if (gameSettingsJson) gameSettings = JSON.parse(gameSettingsJson)
+        if (!gameSettings) return Promise.reject(new Error('Game config not found'))
 
-        const gameConfig = findGameConfigByPlayerId(gameConfigs, playerId)
+        const gameSetting = findGameConfigByPlayerId(gameSettings, playerId)
 
-        if (gameConfig) return Promise.resolve(gameConfig)
+        if (gameSetting) return Promise.resolve(gameSetting)
         else return Promise.reject(new Error('Game config not found'))
     },
     
@@ -28,8 +28,8 @@ export const localGameConfigConnector: GameConfigDataProvider = {
         consecutiveTarget: number,
         botLevel: BotLevel
     ): Promise<GameConfig> => {
-        let gameConfigs = findAllGameConfigs()
-        if (!gameConfigs) gameConfigs = []
+        let gameSettings = findAllGameConfigs()
+        if (!gameSettings) gameSettings = []
 
         const newGameConfig: GameConfig = {
             id: uuidv4(),
@@ -38,21 +38,21 @@ export const localGameConfigConnector: GameConfigDataProvider = {
             botLevel: botLevel,
         }
 
-        gameConfigs.push(newGameConfig)
+        gameSettings.push(newGameConfig)
 
-        setGameConfigs(gameConfigs)
+        setGameConfigs(gameSettings)
 
         return Promise.resolve(newGameConfig)
     },
 }
 
 const findAllGameConfigs = (): GameConfig[] => {
-    const gameConfigsJson = getGameConfigs()
+    const gameSettingsJson = getGameConfigs()
 
-    if (gameConfigsJson) return JSON.parse(gameConfigsJson)
+    if (gameSettingsJson) return JSON.parse(gameSettingsJson)
 
     return []
 }
 
-const findGameConfigByPlayerId = (gameConfigs: GameConfig[], playerId: string): GameConfig =>
-    gameConfigs.find((gameConfig) => gameConfig.playerId == playerId)
+const findGameConfigByPlayerId = (gameSettings: GameConfig[], playerId: string): GameConfig =>
+    gameSettings.find((gameSetting) => gameSetting.playerId == playerId)

@@ -27,10 +27,12 @@ For guidance on obtaining the GOOGLE_CLIENT_ID, please follow this link: https:/
 
 # Disclaimer
 This project is currently at the MVP (Minimum Viable Product) stage. Planned features and improvements include:
-1. Unit testing
-2. Game history
-3. Adjustable game size
-4. Bot difficulty levels
-5. Backend server integration with an SQLite database
-6. Docker setup
-7. UI Improvements
+1. Adjustable game size
+2. Bot difficulty levels
+3. Game owner vs challenger concept to support multiple user and bot
+4. Game history
+5. Unit testing
+6. Backend server integration with an SQLite database
+7. Docker setup
+8. UI Improvements
+

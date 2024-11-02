@@ -32,12 +32,12 @@ export interface Game {
 }
 
 //TODO: Read data API source from process env and do condition in the below
-const gameConfigConnector: GameConfigDataProvider = localGameConfigConnector
+const gameSettingConnector: GameConfigDataProvider = localGameConfigConnector
 const gameConnector: GameDataProvider = localGameConnector
 
-export const getGameConfigByPlayerId = (playerId: string) => gameConfigConnector.getGameConfigByPlayerId(playerId)
+export const getGameConfigByPlayerId = (playerId: string) => gameSettingConnector.getGameConfigByPlayerId(playerId)
 export const createGameConfigByPlayerId = (playerId: string, consecutiveTarget: number, botLevel: BotLevel) =>
-    gameConfigConnector.createGameConfigByPlayerId(playerId, consecutiveTarget, botLevel)
+    gameSettingConnector.createGameConfigByPlayerId(playerId, consecutiveTarget, botLevel)
 
 export const getGameByPlayerId = (playerId: string) => gameConnector.getGameByPlayerId(playerId)
 export const createGameByPlayerId = (playerId: string) => gameConnector.createGameByPlayerId(playerId)

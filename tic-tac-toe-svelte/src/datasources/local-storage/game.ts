@@ -9,10 +9,10 @@ const setGames = (games: Game[]) => localStorage.setItem(GAMES_KEY, JSON.stringi
 
 export const localGameConnector: GameDataProvider = {
     getGameByPlayerId: (playerId: string): Promise<Game> => {
-        const gameConfigsJson = getGames()
+        const gameSettingsJson = getGames()
 
         let games: Game[] | undefined
-        if (gameConfigsJson) games = JSON.parse(gameConfigsJson)
+        if (gameSettingsJson) games = JSON.parse(gameSettingsJson)
         if (!games) return Promise.reject('Game not found')
 
         const game = findGameByPlayerId(games, playerId)

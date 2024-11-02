@@ -16,7 +16,7 @@ export enum PlayerType {
     EMPTY = '',
 }
 
-const DEFAULT_GAME_CONFIG: GameConfigResponse = {
+const DEFAULT_GAME_CONFIG: GameSettingResponse = {
     consecutiveTarget: 3,
     botLevel: BotLevel.EASY,
 }
@@ -31,18 +31,18 @@ export const getGame = async (playerId: string): Promise<GameResponse> => {
     return game
 }
 
-export const getGameConfig = async (playerId: string): Promise<GameConfigResponse> => {
-    let gameConfig: GameConfigResponse
+export const getGameConfig = async (playerId: string): Promise<GameSettingResponse> => {
+    let gameSetting: GameSettingResponse
     try {
-        gameConfig = await getGameConfigByPlayerId(playerId)
+        gameSetting = await getGameConfigByPlayerId(playerId)
     } catch (error) {
-        gameConfig = await createGameConfigByPlayerId(
+        gameSetting = await createGameConfigByPlayerId(
             playerId,
             DEFAULT_GAME_CONFIG.consecutiveTarget,
             DEFAULT_GAME_CONFIG.botLevel
         )
     }
-    return gameConfig
+    return gameSetting
 }
 
 export const processPoint = async (gameId: string, playerType: PlayerType): Promise<GameResponse> => {
@@ -56,7 +56,7 @@ export const processPoint = async (gameId: string, playerType: PlayerType): Prom
     }
 }
 
-export interface GameConfigResponse {
+export interface GameSettingResponse {
     consecutiveTarget: number
     botLevel: number
 }

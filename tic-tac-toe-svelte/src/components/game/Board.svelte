@@ -2,10 +2,10 @@
     import { createEventDispatcher, onMount } from 'svelte'
     import { fade } from 'svelte/transition'
     import type { Bot } from '../../services/bot.svelte'
-    import { PlayerType, type GameConfigResponse, type GameResponse } from '../../services/game.svelte'
+    import { PlayerType, type GameSettingResponse, type GameResponse } from '../../services/game.svelte'
 
     export let game: GameResponse
-    export let gameConfig: GameConfigResponse
+    export let gameSetting: GameSettingResponse
     export let gameSize = 3
     export let bot: Bot
 
@@ -123,7 +123,7 @@
 
             if (currentPlayer === PlayerType.PLAYER) {
                 alertAndResetBoard(
-                    game.playerNumberOfConsecutiveWins + 1 == gameConfig.consecutiveTarget
+                    game.playerNumberOfConsecutiveWins + 1 == gameSetting.consecutiveTarget
                         ? 'Congraturation!, you got 1 bonus point, so the point has been +2 ^^'
                         : 'You win!, the point has been +1'
                 )
