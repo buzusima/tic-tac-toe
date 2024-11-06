@@ -34,11 +34,12 @@ TODO
 # Disclaimer
 This project is currently at the MVP (Minimum Viable Product) stage. Planned features and improvements include:
 1. Adjustable game size - Done
-2. Bot difficulty levels
-3. Game owner vs challenger concept to support multiple user and bot
+2. Game owner vs challenger concept - Done
+3. Change player type BOT/Player - Done
 4. Game history
-5. Unit testing
-6. Backend server integration with an SQLite database
-7. Docker setup
-8. UI Improvements
+5. Bot difficulty levels
+6. Unit testing
+7. Backend server integration with an SQLite database
+8. Docker setup
+9. UI Improvements
 

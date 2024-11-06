@@ -1,117 +1,120 @@
-import { v4 as uuidv4 } from 'uuid'
-import type { Game, GameDataProvider } from '../data-provider'
+import { v4 as uuidv4 } from "uuid"
+import type { Game, GameDataProvider } from "../data-provider"
 
-const GAMES_KEY = 'games'
+const GAMES_KEY = "games"
 
 const getGames = () => localStorage.getItem(GAMES_KEY)
 
-const setGames = (games: Game[]) => localStorage.setItem(GAMES_KEY, JSON.stringify(games))
+const setGames = (games: Game[]) =>
+  localStorage.setItem(GAMES_KEY, JSON.stringify(games))
 
 export const localGameConnector: GameDataProvider = {
-    getGameByGameOwnerId: (ownerId: string): Promise<Game> => {
-        const gameSettingsJson = getGames()
+  getGameByGameOwnerId: (ownerId: string): Promise<Game> => {
+    const gameSettingsJson = getGames()
 
-        let games: Game[] | undefined
-        if (gameSettingsJson) games = JSON.parse(gameSettingsJson)
-        if (!games) return Promise.reject('Game not found')
+    let games: Game[] | undefined
+    if (gameSettingsJson) games = JSON.parse(gameSettingsJson)
+    if (!games) return Promise.reject("Game not found")
 
-        const game = findGameByGameOwnerId(games, ownerId)
+    const game = findGameByGameOwnerId(games, ownerId)
 
-        if (game) return Promise.resolve(game)
-        else return Promise.reject('Game not found')
-    },
+    if (game) return Promise.resolve(game)
+    else return Promise.reject("Game not found")
+  },
 
-    createGameByGameOwnerId: (ownerId: string): Promise<Game> => {
-        let games = findAllGames()
-        if (!games) games = []
+  createGameByGameOwnerId: (ownerId: string): Promise<Game> => {
+    let games = findAllGames()
+    if (!games) games = []
 
-        const newGame: Game = {
-            id: uuidv4(),
-            ownerId: ownerId,
-            ownerPoint: 0,
-            ownerNumberOfConsecutiveWins: 0,
-            challengerPoint: 0,
-        }
+    const newGame: Game = {
+      id: uuidv4(),
+      ownerId: ownerId,
+      ownerPoint: 0,
+      ownerNumberOfConsecutiveWins: 0,
+      challengerPoint: 0,
+    }
 
-        games.push(newGame)
+    games.push(newGame)
 
-        setGames(games)
+    setGames(games)
 
-        return Promise.resolve(newGame)
-    },
+    return Promise.resolve(newGame)
+  },
 
-    addGameOwnerPoint: (gameId: string): Promise<Game> => {
-        let games = findAllGames()
-        if (!games) Promise.reject('Game not found')
+  addGameOwnerPoint: (gameId: string): Promise<Game> => {
+    let games = findAllGames()
+    if (!games) Promise.reject("Game not found")
 
-        const gameIndex = findGameIndexById(games, gameId)
-        if (gameIndex == -1) Promise.reject('Game not found')
+    const gameIndex = findGameIndexById(games, gameId)
+    if (gameIndex == -1) Promise.reject("Game not found")
 
-        games[gameIndex].ownerNumberOfConsecutiveWins += 1
-        games[gameIndex].ownerPoint += 1
+    games[gameIndex].ownerNumberOfConsecutiveWins += 1
+    games[gameIndex].ownerPoint += 1
 
-        if (games[gameIndex].ownerNumberOfConsecutiveWins >= 3) {
-            games[gameIndex].ownerNumberOfConsecutiveWins = 0
-            games[gameIndex].ownerPoint += 1
-        }
+    if (games[gameIndex].ownerNumberOfConsecutiveWins >= 3) {
+      games[gameIndex].ownerNumberOfConsecutiveWins = 0
+      games[gameIndex].ownerPoint += 1
+    }
 
-        setGames(games)
+    setGames(games)
 
-        return Promise.resolve(games[gameIndex])
-    },
+    return Promise.resolve(games[gameIndex])
+  },
 
-    minusGameOwnerPoint: (gameId: string): Promise<Game> => {
-        let games = findAllGames()
-        if (!games) Promise.reject('Game not found')
+  minusGameOwnerPoint: (gameId: string): Promise<Game> => {
+    let games = findAllGames()
+    if (!games) Promise.reject("Game not found")
 
-        const gameIndex = findGameIndexById(games, gameId)
-        if (gameIndex == -1) Promise.reject('Game not found')
+    const gameIndex = findGameIndexById(games, gameId)
+    if (gameIndex == -1) Promise.reject("Game not found")
 
-        games[gameIndex].ownerPoint -= 1
+    games[gameIndex].ownerPoint -= 1
 
-        setGames(games)
+    setGames(games)
 
-        return Promise.resolve(games[gameIndex])
-    },
+    return Promise.resolve(games[gameIndex])
+  },
 
-    resetGameOwnerNumberOfConsecutiveWins: (gameId: string): Promise<Game> => {
-        let games = findAllGames()
-        if (!games) Promise.reject('Game not found')
+  resetGameOwnerNumberOfConsecutiveWins: (gameId: string): Promise<Game> => {
+    let games = findAllGames()
+    if (!games) Promise.reject("Game not found")
 
-        const gameIndex = findGameIndexById(games, gameId)
-        if (gameIndex == -1) Promise.reject('Game not found')
+    const gameIndex = findGameIndexById(games, gameId)
+    if (gameIndex == -1) Promise.reject("Game not found")
 
-        games[gameIndex].ownerNumberOfConsecutiveWins = 0
+    games[gameIndex].ownerNumberOfConsecutiveWins = 0
 
-        setGames(games)
+    setGames(games)
 
-        return Promise.resolve(games[gameIndex])
-    },
+    return Promise.resolve(games[gameIndex])
+  },
 
-    addChallengerPoint: (gameId: string): Promise<Game> => {
-        let games = findAllGames()
-        if (!games) Promise.reject('Game not found')
+  addChallengerPoint: (gameId: string): Promise<Game> => {
+    let games = findAllGames()
+    if (!games) Promise.reject("Game not found")
 
-        const gameIndex = findGameIndexById(games, gameId)
-        if (gameIndex == -1) Promise.reject('Game not found')
+    const gameIndex = findGameIndexById(games, gameId)
+    if (gameIndex == -1) Promise.reject("Game not found")
 
-        games[gameIndex].challengerPoint += 1
-        games[gameIndex].ownerNumberOfConsecutiveWins = 0
+    games[gameIndex].challengerPoint += 1
+    games[gameIndex].ownerNumberOfConsecutiveWins = 0
 
-        setGames(games)
+    setGames(games)
 
-        return Promise.resolve(games[gameIndex])
-    },
+    return Promise.resolve(games[gameIndex])
+  },
 }
 
 const findAllGames = (): Game[] => {
-    const gamesJson = getGames()
+  const gamesJson = getGames()
 
-    if (gamesJson) return JSON.parse(gamesJson)
+  if (gamesJson) return JSON.parse(gamesJson)
 
-    return []
+  return []
 }
 
-const findGameByGameOwnerId = (games: Game[], ownerId: string): Game => games.find((game) =>  game.ownerId == ownerId)
+const findGameByGameOwnerId = (games: Game[], ownerId: string): Game =>
+  games.find((game) => game.ownerId == ownerId)
 
-const findGameIndexById = (games: Game[], id: string): number => games.findIndex((game) => game.id == id)
+const findGameIndexById = (games: Game[], id: string): number =>
+  games.findIndex((game) => game.id == id)
