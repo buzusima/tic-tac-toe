@@ -1,14 +1,17 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { authProviders } from "../authProviders/auth";
-    import { getPlayerProfile, playerProfile } from "../services/player.svelte";
+    import {
+        getGameOwnerProfile,
+        gameOwnerProfile,
+    } from "../services/game-owner.svelte";
 
     const GOOGLE_CLIENT_ID = import.meta.env.OAUTH_GOOGLE_CLIENT_ID;
 
     onMount(() => {
-        const pProfile = getPlayerProfile();
+        const pProfile = getGameOwnerProfile();
         if (pProfile) {
-            playerProfile.set(pProfile);
+            gameOwnerProfile.set(pProfile);
         } else {
             if (GOOGLE_CLIENT_ID)
                 authProviders.google.initialize(

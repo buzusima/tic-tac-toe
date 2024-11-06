@@ -1,4 +1,4 @@
-import type { Bot } from '../services/bot.svelte'
+import type { Bot } from './bot'
 import { PlayerType } from '../services/game.svelte'
 
 export const RandomBot: Bot = {

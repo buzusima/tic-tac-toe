@@ -1,48 +1,74 @@
-import type { BotLevel } from '../services/bot.svelte'
+import type { BotLevel } from '../bots/bot'
 import { localGameConnector } from './local-storage/game'
-import { localGameConfigConnector } from './local-storage/game-config'
+import { localGameSettingConnector } from './local-storage/game-config'
 
-export interface GameConfigDataProvider {
-    getGameConfigByPlayerId: (playerId: string) => Promise<GameConfig>
-    createGameConfigByPlayerId: (playerId: string, consecutiveTarget: number, botLevel: BotLevel) => Promise<GameConfig>
+export interface GameSettingDataProvider {
+    getGameSettingByGameOwnerId: (ownerId: string) => Promise<GameSetting>
+    createGameSettingByGameOwnerId: (
+        ownerId: string,
+        consecutiveTarget: number,
+        challengerType: ChallengerType,
+        botLevel: BotLevel,
+        gameSize: number) => Promise<GameSetting>
+    setGameSettingById: (
+        id: string,
+        challengerType: ChallengerType,
+        gameSize: number) => Promise<GameSetting>
 }
 
 export interface GameDataProvider {
-    getGameByPlayerId: (playerId: string) => Promise<Game>
-    createGameByPlayerId: (playerId: string) => Promise<Game>
-    addPlayerPoint: (gameId: string) => Promise<Game>
-    minusPlayerPoint: (gameId: string) => Promise<Game>
-    resetPlayerNumberOfConsecutiveWins: (gameId: string) => Promise<Game>
-    addBotPoint: (gameId: string) => Promise<Game>
+    getGameByGameOwnerId: (ownerId: string) => Promise<Game>
+    createGameByGameOwnerId: (ownerId: string) => Promise<Game>
+    addGameOwnerPoint: (gameId: string) => Promise<Game>
+    minusGameOwnerPoint: (gameId: string) => Promise<Game>
+    resetGameOwnerNumberOfConsecutiveWins: (gameId: string) => Promise<Game>
+    addChallengerPoint: (gameId: string) => Promise<Game>
 }
 
-export interface GameConfig {
+export enum ChallengerType {
+    BOT = 1,
+    PLAYER = 2
+}
+
+export interface GameSetting {
     id: string
-    playerId: string
+    ownerId: string
     consecutiveTarget: number
+    challengerType: ChallengerType
     botLevel: number
+    gameSize: number
 }
 
 export interface Game {
     id: string
-    playerId: string
-    playerPoint: number
-    playerNumberOfConsecutiveWins: number
-    botPoint: number
+    ownerId: string
+    ownerPoint: number
+    ownerNumberOfConsecutiveWins: number
+    challengerPoint: number
 }
 
 //TODO: Read data API source from process env and do condition in the below
-const gameSettingConnector: GameConfigDataProvider = localGameConfigConnector
+const gameSettingConnector: GameSettingDataProvider = localGameSettingConnector
 const gameConnector: GameDataProvider = localGameConnector
 
-export const getGameConfigByPlayerId = (playerId: string) => gameSettingConnector.getGameConfigByPlayerId(playerId)
-export const createGameConfigByPlayerId = (playerId: string, consecutiveTarget: number, botLevel: BotLevel) =>
-    gameSettingConnector.createGameConfigByPlayerId(playerId, consecutiveTarget, botLevel)
+export const getGameSettingByGameOwnerId = (ownerId: string) => gameSettingConnector.getGameSettingByGameOwnerId(ownerId)
+export const createGameSettingByGameOwnerId = (
+    ownerId: string,
+    consecutiveTarget: number,
+    challengerType: ChallengerType,
+    botLevel: BotLevel,
+    gameSize: number) =>
+    gameSettingConnector.createGameSettingByGameOwnerId(ownerId, consecutiveTarget, challengerType, botLevel, gameSize)
+export const setGameSettingById = (
+    id: string,
+    challengerType: ChallengerType,
+    gameSize: number) =>
+    gameSettingConnector.setGameSettingById(id, challengerType, gameSize)
 
-export const getGameByPlayerId = (playerId: string) => gameConnector.getGameByPlayerId(playerId)
-export const createGameByPlayerId = (playerId: string) => gameConnector.createGameByPlayerId(playerId)
-export const addPlayerPoint = (gameId: string) => gameConnector.addPlayerPoint(gameId)
-export const minusPlayerPoint = (gameId: string) => gameConnector.minusPlayerPoint(gameId)
-export const resetPlayerNumberOfConsecutiveWins = (gameId: string) =>
-    gameConnector.resetPlayerNumberOfConsecutiveWins(gameId)
-export const addBotPoint = (gameId: string) => gameConnector.addBotPoint(gameId)
+export const getGameByGameOwnerId = (ownerId: string) => gameConnector.getGameByGameOwnerId(ownerId)
+export const createGameByGameOwnerId = (ownerId: string) => gameConnector.createGameByGameOwnerId(ownerId)
+export const addGameOwnerPoint = (gameId: string) => gameConnector.addGameOwnerPoint(gameId)
+export const minusGameOwnerPoint = (gameId: string) => gameConnector.minusGameOwnerPoint(gameId)
+export const resetGameOwnerNumberOfConsecutiveWins = (gameId: string) =>
+    gameConnector.resetGameOwnerNumberOfConsecutiveWins(gameId)
+export const addChallengerPoint = (gameId: string) => gameConnector.addChallengerPoint(gameId)

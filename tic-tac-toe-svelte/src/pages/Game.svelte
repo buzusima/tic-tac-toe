@@ -1,60 +1,57 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { fade } from "svelte/transition";
+    import { type Bot } from "../bots/bot";
     import Board from "../components/game/Board.svelte";
-    import { getBot, type Bot } from "../services/bot.svelte";
+    import GameSettings from "../components/game/GameSettings.svelte";
+    import GameStatus from "../components/game/GameStatus.svelte";
     import {
         getGame,
-        getGameConfig,
+        getGameSetting,
         PlayerType,
         processPoint,
-        type GameSettingResponse,
         type GameResponse,
+        type GameSettingResponse,
     } from "../services/game.svelte";
-    import { logout, playerProfile } from "../services/player.svelte";
-    import GameStatus from "../components/game/GameStatus.svelte";
-    import GameSettings from "../components/game/GameSettings.svelte";
+    import { logout, gameOwnerProfile } from "../services/game-owner.svelte";
 
-    const GAME_SIZE = 3;
-
-    let bot: Bot;
+    let bot = $state<Bot>();
 
     let gameEnd = false;
-    let winner: PlayerType = PlayerType.EMPTY;
+    let winner = $state<PlayerType>(PlayerType.EMPTY);
 
-    let getGameConfigFunction: Promise<GameSettingResponse>;
-    let getGameFunction: Promise<GameResponse>;
+    let getGameSettingFunction = $state<Promise<GameSettingResponse>>();
+    let getGameFunction = $state<Promise<GameResponse>>();
 
-    let gameSetting: GameSettingResponse;
-    let game: GameResponse;
+    let gameSetting = $state<GameSettingResponse>();
+    let game = $state<GameResponse>();
+
+    let board = $state<Board>();
 
     const handleOnGameEnd = async (event: any) => {
         gameEnd = true;
         winner = event.detail;
 
-        game = await processPoint(game.id, winner);
+        game = await processPoint(game!!.id, winner);
     };
 
     onMount(async () => {
-        if ($playerProfile) {
-            getGameConfigFunction = getGameConfig($playerProfile.reference);
-            getGameFunction = getGame($playerProfile.reference);
+        if ($gameOwnerProfile) {
+            getGameSettingFunction = getGameSetting($gameOwnerProfile.reference);
+            getGameFunction = getGame($gameOwnerProfile.reference);
         }
 
         try {
-            gameSetting = await getGameConfigFunction;
+            gameSetting = await getGameSettingFunction;
             game = await getGameFunction;
-
-            if (gameSetting) bot = getBot(gameSetting.botLevel);
         } catch (error) {
             console.error(error);
         }
     });
 </script>
 
-{#if $playerProfile}
+{#if $gameOwnerProfile}
     <div class="header-container">
-        <span class="player-profile-container">{$playerProfile.name}</span>
+        <span class="player-profile-container">{$gameOwnerProfile.name}</span>
         <button type="button" class="logout-button" onclick={logout}>
             <span class="material-symbols-outlined"> logout </span>
             <span class="logout-text">Logout</span>
@@ -62,26 +59,32 @@
     </div>
 {/if}
 <div class="game-panel-container">
-    {#await getGameConfigFunction then}
+    {#await getGameSettingFunction then}
         {#await getGameFunction then}
-            <div class="game-panel">
-                <div>
+            {#if gameSetting && game}
+                <div class="game-panel">
                     {#if game}
-                        <div class="setting-contianer"><GameSettings bind:gameSetting/></div>
-                        <GameStatus bind:gameSetting bind:game bind:winner />
+                        <div>
+                            <div class="setting-contianer">
+                                <GameSettings bind:gameSetting />
+                            </div>
+                            <GameStatus
+                                bind:gameSetting
+                                bind:game
+                                bind:winner
+                            />
+                        </div>
+                        <div class="board-container">
+                            <Board
+                                bind:this={board}
+                                {game}
+                                bind:gameSetting
+                                on:gameEnd={handleOnGameEnd}
+                            />
+                        </div>
                     {/if}
                 </div>
-
-                <div class="board-container">
-                    <Board
-                        {game}
-                        {gameSetting}
-                        gameSize={GAME_SIZE}
-                        {bot}
-                        on:gameEnd={handleOnGameEnd}
-                    />
-                </div>
-            </div>
+            {/if}
         {/await}
     {/await}
 </div>

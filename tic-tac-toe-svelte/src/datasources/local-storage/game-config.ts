@@ -1,58 +1,78 @@
 import { v4 as uuidv4 } from 'uuid'
-import { BotLevel } from '../../services/bot.svelte'
-import type { GameConfig, GameConfigDataProvider } from '../data-provider'
+import { BotLevel } from '../../bots/bot'
+import type { ChallengerType, GameSetting, GameSettingDataProvider } from '../data-provider'
 
-const GAME_CONFIGS_KEY = 'game-configs'
+const GAME_SETTINGS_KEY = 'game-settings'
 
-const getGameConfigs = () => localStorage.getItem(GAME_CONFIGS_KEY)
+const getGameSettings = () => localStorage.getItem(GAME_SETTINGS_KEY)
 
-const setGameConfigs = (gameSettings: GameConfig[]) =>
-    localStorage.setItem(GAME_CONFIGS_KEY, JSON.stringify(gameSettings))
+const setGameSettings = (gameSettings: GameSetting[]) =>
+    localStorage.setItem(GAME_SETTINGS_KEY, JSON.stringify(gameSettings))
 
-export const localGameConfigConnector: GameConfigDataProvider = {
-    getGameConfigByPlayerId: (playerId: string): Promise<GameConfig> => {
-        const gameSettingsJson = getGameConfigs()
+export const localGameSettingConnector: GameSettingDataProvider = {
+    getGameSettingByGameOwnerId: (ownerId: string): Promise<GameSetting> => {
+        const gameSettingsJson = getGameSettings()
 
-        let gameSettings: GameConfig[] | undefined
+        let gameSettings: GameSetting[] | undefined
         if (gameSettingsJson) gameSettings = JSON.parse(gameSettingsJson)
-        if (!gameSettings) return Promise.reject(new Error('Game config not found'))
+        if (!gameSettings) return Promise.reject(new Error('Game setting not found'))
 
-        const gameSetting = findGameConfigByPlayerId(gameSettings, playerId)
+        const gameSetting = findGameSettingByGameOwnerId(gameSettings, ownerId)
 
         if (gameSetting) return Promise.resolve(gameSetting)
-        else return Promise.reject(new Error('Game config not found'))
+        else return Promise.reject(new Error('Game setting not found'))
     },
-    
-    createGameConfigByPlayerId: (
-        playerId: string,
+
+    createGameSettingByGameOwnerId: (
+        ownerId: string,
         consecutiveTarget: number,
-        botLevel: BotLevel
-    ): Promise<GameConfig> => {
-        let gameSettings = findAllGameConfigs()
+        challengerType: ChallengerType,
+        botLevel: BotLevel,
+        gameSize: number
+    ): Promise<GameSetting> => {
+        let gameSettings = findAllGameSettings()
         if (!gameSettings) gameSettings = []
 
-        const newGameConfig: GameConfig = {
+        const newGameSetting: GameSetting = {
             id: uuidv4(),
-            playerId: playerId,
+            ownerId: ownerId,
             consecutiveTarget: consecutiveTarget,
+            challengerType: challengerType,
             botLevel: botLevel,
+            gameSize: gameSize
         }
 
-        gameSettings.push(newGameConfig)
+        gameSettings.push(newGameSetting)
 
-        setGameConfigs(gameSettings)
+        setGameSettings(gameSettings)
 
-        return Promise.resolve(newGameConfig)
+        return Promise.resolve(newGameSetting)
     },
+
+    setGameSettingById: (id: string, challengerType: ChallengerType, gameSize: number): Promise<GameSetting> => {
+        let gameSettings = findAllGameSettings()
+        if (!gameSettings) return Promise.reject(new Error('Game setting not found'))
+
+        const gameIndex = findGameSettingIndexById(gameSettings, id)
+        gameSettings[gameIndex].challengerType = challengerType
+        gameSettings[gameIndex].gameSize = gameSize
+
+        setGameSettings(gameSettings)
+
+        return Promise.resolve(gameSettings[gameIndex])
+    },
+
 }
 
-const findAllGameConfigs = (): GameConfig[] => {
-    const gameSettingsJson = getGameConfigs()
+const findAllGameSettings = (): GameSetting[] => {
+    const gameSettingsJson = getGameSettings()
 
     if (gameSettingsJson) return JSON.parse(gameSettingsJson)
 
     return []
 }
 
-const findGameConfigByPlayerId = (gameSettings: GameConfig[], playerId: string): GameConfig =>
-    gameSettings.find((gameSetting) => gameSetting.playerId == playerId)
+const findGameSettingByGameOwnerId = (gameSettings: GameSetting[], ownerId: string): GameSetting =>
+    gameSettings.find((gameSetting) => gameSetting.ownerId == ownerId)
+
+const findGameSettingIndexById = (gameSettings: GameSetting[], id: string): number => gameSettings.findIndex((gameSetting) => gameSetting.id == id)

@@ -3,13 +3,19 @@
     import { fade } from "svelte/transition";
     import {
         PlayerType,
-        type GameSettingResponse,
         type GameResponse,
+        type GameSettingResponse,
     } from "../../services/game.svelte";
 
-    export let gameSetting: GameSettingResponse;
-    export let game: GameResponse;
-    export let winner: PlayerType;
+    let {
+        gameSetting = $bindable(),
+        game = $bindable(),
+        winner = $bindable(),
+    }: {
+        gameSetting: GameSettingResponse;
+        game: GameResponse;
+        winner: PlayerType;
+    } = $props();
 
     onMount(() => {});
 </script>
@@ -21,18 +27,18 @@
             ? 'win'
             : ''}"
     >
-        {#key game.playerPoint}
-            Point: <span in:fade={{ duration: 1000 }}>{game.playerPoint}</span>
+        {#key game.ownerPoint}
+            Point: <span in:fade={{ duration: 1000 }}>{game.ownerPoint}</span>
         {/key}
 
         <div class="consecutive-container">
             Consecutive Wins:
-            {#each { length: game.playerNumberOfConsecutiveWins } as _, i}
+            {#each { length: game.ownerNumberOfConsecutiveWins } as _, i}
                 <div class="consecutive-current" in:fade></div>
             {/each}
 
             {#if gameSetting}
-                {#each { length: gameSetting.consecutiveTarget - game.playerNumberOfConsecutiveWins } as _, i}
+                {#each { length: gameSetting.consecutiveTarget - game.ownerNumberOfConsecutiveWins } as _, i}
                     <div class="consecutive-target"></div>
                 {/each}
             {/if}
@@ -44,7 +50,7 @@
         Bot ({PlayerType.BOT})
     </span>
     <div class="bot-point-container {winner === PlayerType.BOT ? 'win' : ''}">
-        Point: {game.botPoint}
+        Point: {game.challengerPoint}
     </div>
 </div>
 
@@ -54,7 +60,7 @@
 
         .player-point-container {
             border: 0.125rem solid gray;
-            border-radius: 0.4rem;
+            border-radius: 0.375rem;
             padding: 0.313rem 5rem 0.313rem 1rem;
             &.win {
                 border: 0.125rem solid lightgreen;
@@ -72,13 +78,13 @@
                 height: 1rem;
                 background-color: aqua;
                 border: 0.125rem solid aqua;
-                border-radius: 0.2rem;
+                border-radius: 0.375rem;
             }
             .consecutive-target {
                 width: 0.5rem;
                 height: 1rem;
                 border: 0.125rem solid aqua;
-                border-radius: 0.2rem;
+                border-radius: 0.375rem;
             }
         }
     }
@@ -89,7 +95,7 @@
 
         .bot-point-container {
             border: 0.125rem solid gray;
-            border-radius: 0.4rem;
+            border-radius: 0.375rem;
             padding: 0.313rem 5rem 0.313rem 1rem;
             &.win {
                 border: 0.125rem solid lightcoral;

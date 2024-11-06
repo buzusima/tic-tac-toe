@@ -1,11 +1,11 @@
 <script lang="ts">
     import Game from './pages/Game.svelte'
     import Login from './pages/Login.svelte'
-    import { playerProfile } from './services/player.svelte'
+    import { gameOwnerProfile } from './services/game-owner.svelte'
 </script>
 
 <main>
-    {#if !$playerProfile}
+    {#if !$gameOwnerProfile}
         <Login />
     {:else}
         <Game />

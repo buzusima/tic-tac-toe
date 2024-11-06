@@ -1,14 +1,15 @@
 import {
-    addBotPoint,
-    addPlayerPoint,
-    createGameByPlayerId,
-    createGameConfigByPlayerId,
-    getGameByPlayerId,
-    getGameConfigByPlayerId,
-    minusPlayerPoint,
-    resetPlayerNumberOfConsecutiveWins,
+    addChallengerPoint,
+    addGameOwnerPoint,
+    ChallengerType,
+    createGameByGameOwnerId,
+    createGameSettingByGameOwnerId,
+    setGameSettingById,
+    getGameByGameOwnerId,
+    getGameSettingByGameOwnerId,
+    minusGameOwnerPoint,
+    resetGameOwnerNumberOfConsecutiveWins,
 } from '../datasources/data-provider'
-import { BotLevel } from './bot.svelte'
 
 export enum PlayerType {
     PLAYER = 'X',
@@ -16,55 +17,67 @@ export enum PlayerType {
     EMPTY = '',
 }
 
-const DEFAULT_GAME_CONFIG: GameSettingResponse = {
+const DEFAULT_GAME_CONFIG = {
     consecutiveTarget: 3,
-    botLevel: BotLevel.EASY,
+    challengerType: ChallengerType.BOT,
+    botLevel: 1,
+    gameSize: 3,
 }
 
-export const getGame = async (playerId: string): Promise<GameResponse> => {
+export const getGame = async (gameOwnerId: string): Promise<GameResponse> => {
     let game: GameResponse
     try {
-        game = await getGameByPlayerId(playerId)
+        game = await getGameByGameOwnerId(gameOwnerId)
     } catch (error) {
-        game = await createGameByPlayerId(playerId)
+        game = await createGameByGameOwnerId(gameOwnerId)
     }
     return game
 }
 
-export const getGameConfig = async (playerId: string): Promise<GameSettingResponse> => {
+export const getGameSetting = async (gameOwnerId: string): Promise<GameSettingResponse> => {
     let gameSetting: GameSettingResponse
     try {
-        gameSetting = await getGameConfigByPlayerId(playerId)
+        gameSetting = await getGameSettingByGameOwnerId(gameOwnerId)
     } catch (error) {
-        gameSetting = await createGameConfigByPlayerId(
-            playerId,
+        gameSetting = await createGameSettingByGameOwnerId(
+            gameOwnerId,
             DEFAULT_GAME_CONFIG.consecutiveTarget,
-            DEFAULT_GAME_CONFIG.botLevel
+            DEFAULT_GAME_CONFIG.challengerType,
+            DEFAULT_GAME_CONFIG.botLevel,
+            DEFAULT_GAME_CONFIG.gameSize
         )
     }
     return gameSetting
 }
 
+export const setGameSetting = (id: string, challengerType: ChallengerType, gameSize: number): Promise<GameSettingResponse> => {
+    return setGameSettingById(id, challengerType, gameSize)
+}
+
 export const processPoint = async (gameId: string, playerType: PlayerType): Promise<GameResponse> => {
     if (playerType === PlayerType.PLAYER) {
-        return addPlayerPoint(gameId)
+        return addGameOwnerPoint(gameId)
     } else if (playerType === PlayerType.BOT) {
-        await addBotPoint(gameId)
-        return minusPlayerPoint(gameId)
+        await addChallengerPoint(gameId)
+        return minusGameOwnerPoint(gameId)
     } else {
-        return resetPlayerNumberOfConsecutiveWins(gameId)
+        return resetGameOwnerNumberOfConsecutiveWins(gameId)
     }
 }
 
 export interface GameSettingResponse {
+    id: string
+    ownerId: string
     consecutiveTarget: number
+    challengerType: ChallengerType
     botLevel: number
+    gameSize: number
 }
 
 export interface GameResponse {
     id: string
-    playerId: string
-    playerPoint: number
-    playerNumberOfConsecutiveWins: number
-    botPoint: number
+    ownerId: string
+    ownerPoint: number
+    ownerNumberOfConsecutiveWins: number
+    challengerPoint: number
 }

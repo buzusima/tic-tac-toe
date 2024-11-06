@@ -1,4 +1,4 @@
-import { processAfterGoogleLogin, type GoogleAccountProfile } from '../services/player.svelte'
+import { processAfterGoogleLogin, type GoogleAccountProfile } from '../services/game-owner.svelte'
 
 export const initializeGoogle = (clientId: string, renderButtonId: string) => {
     const script = document.createElement('script')

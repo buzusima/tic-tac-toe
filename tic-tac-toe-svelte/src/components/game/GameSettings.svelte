@@ -1,16 +1,18 @@
 <script lang="ts">
-    import { onMount } from "svelte";
     import type { GameSettingResponse } from "../../services/game.svelte";
+    import GameSettingModal from "./GameSettingModal.svelte";
 
-    export let gameSetting: GameSettingResponse;
+    let { gameSetting = $bindable() }: { gameSetting: GameSettingResponse } = $props();
 
-    onMount(() => {});
+    let showModal = $state(false);
 </script>
 
-<button class="setting-button">
+<button class="setting-button" onclick={() => (showModal = true)}>
     <span class="material-symbols-outlined"> settings </span>
     <span class="setting-text">Settings</span>
 </button>
+
+<GameSettingModal bind:showModal bind:gameSetting />
 
 <style>
     .setting-button {

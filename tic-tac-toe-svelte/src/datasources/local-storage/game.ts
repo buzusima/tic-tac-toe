@@ -8,29 +8,29 @@ const getGames = () => localStorage.getItem(GAMES_KEY)
 const setGames = (games: Game[]) => localStorage.setItem(GAMES_KEY, JSON.stringify(games))
 
 export const localGameConnector: GameDataProvider = {
-    getGameByPlayerId: (playerId: string): Promise<Game> => {
+    getGameByGameOwnerId: (ownerId: string): Promise<Game> => {
         const gameSettingsJson = getGames()
 
         let games: Game[] | undefined
         if (gameSettingsJson) games = JSON.parse(gameSettingsJson)
         if (!games) return Promise.reject('Game not found')
 
-        const game = findGameByPlayerId(games, playerId)
+        const game = findGameByGameOwnerId(games, ownerId)
 
         if (game) return Promise.resolve(game)
         else return Promise.reject('Game not found')
     },
 
-    createGameByPlayerId: (playerId: string): Promise<Game> => {
+    createGameByGameOwnerId: (ownerId: string): Promise<Game> => {
         let games = findAllGames()
         if (!games) games = []
 
         const newGame: Game = {
             id: uuidv4(),
-            playerId: playerId,
-            playerPoint: 0,
-            playerNumberOfConsecutiveWins: 0,
-            botPoint: 0,
+            ownerId: ownerId,
+            ownerPoint: 0,
+            ownerNumberOfConsecutiveWins: 0,
+            challengerPoint: 0,
         }
 
         games.push(newGame)
@@ -40,19 +40,19 @@ export const localGameConnector: GameDataProvider = {
         return Promise.resolve(newGame)
     },
 
-    addPlayerPoint: (gameId: string): Promise<Game> => {
+    addGameOwnerPoint: (gameId: string): Promise<Game> => {
         let games = findAllGames()
         if (!games) Promise.reject('Game not found')
 
         const gameIndex = findGameIndexById(games, gameId)
         if (gameIndex == -1) Promise.reject('Game not found')
 
-        games[gameIndex].playerNumberOfConsecutiveWins += 1
-        games[gameIndex].playerPoint += 1
+        games[gameIndex].ownerNumberOfConsecutiveWins += 1
+        games[gameIndex].ownerPoint += 1
 
-        if (games[gameIndex].playerNumberOfConsecutiveWins >= 3) {
-            games[gameIndex].playerNumberOfConsecutiveWins = 0
-            games[gameIndex].playerPoint += 1
+        if (games[gameIndex].ownerNumberOfConsecutiveWins >= 3) {
+            games[gameIndex].ownerNumberOfConsecutiveWins = 0
+            games[gameIndex].ownerPoint += 1
         }
 
         setGames(games)
@@ -60,43 +60,43 @@ export const localGameConnector: GameDataProvider = {
         return Promise.resolve(games[gameIndex])
     },
 
-    minusPlayerPoint: (gameId: string): Promise<Game> => {
+    minusGameOwnerPoint: (gameId: string): Promise<Game> => {
         let games = findAllGames()
         if (!games) Promise.reject('Game not found')
 
         const gameIndex = findGameIndexById(games, gameId)
         if (gameIndex == -1) Promise.reject('Game not found')
 
-        games[gameIndex].playerPoint -= 1
+        games[gameIndex].ownerPoint -= 1
 
         setGames(games)
 
         return Promise.resolve(games[gameIndex])
     },
 
-    resetPlayerNumberOfConsecutiveWins: (gameId: string): Promise<Game> => {
+    resetGameOwnerNumberOfConsecutiveWins: (gameId: string): Promise<Game> => {
         let games = findAllGames()
         if (!games) Promise.reject('Game not found')
 
         const gameIndex = findGameIndexById(games, gameId)
         if (gameIndex == -1) Promise.reject('Game not found')
 
-        games[gameIndex].playerNumberOfConsecutiveWins = 0
+        games[gameIndex].ownerNumberOfConsecutiveWins = 0
 
         setGames(games)
 
         return Promise.resolve(games[gameIndex])
     },
 
-    addBotPoint: (gameId: string): Promise<Game> => {
+    addChallengerPoint: (gameId: string): Promise<Game> => {
         let games = findAllGames()
         if (!games) Promise.reject('Game not found')
 
         const gameIndex = findGameIndexById(games, gameId)
         if (gameIndex == -1) Promise.reject('Game not found')
 
-        games[gameIndex].botPoint += 1
-        games[gameIndex].playerNumberOfConsecutiveWins = 0
+        games[gameIndex].challengerPoint += 1
+        games[gameIndex].ownerNumberOfConsecutiveWins = 0
 
         setGames(games)
 
@@ -112,6 +112,6 @@ const findAllGames = (): Game[] => {
     return []
 }
 
-const findGameByPlayerId = (games: Game[], playerId: string): Game => games.find((game) =>  game.playerId == playerId)
+const findGameByGameOwnerId = (games: Game[], ownerId: string): Game => games.find((game) =>  game.ownerId == ownerId)
 
 const findGameIndexById = (games: Game[], id: string): number => games.findIndex((game) => game.id == id)

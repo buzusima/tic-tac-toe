@@ -1,11 +1,5 @@
-import { RandomBot } from '../bots/random'
-import { PlayerType } from './game.svelte'
-
-export enum BotLevel {
-    EASY = 1,
-    MEDIUM = 2,
-    HARD = 3,
-}
+import { RandomBot } from './random-bot'
+import { PlayerType } from '../services/game.svelte'
 
 export const getBot = (botLevel: BotLevel): Bot => {
     switch (botLevel) {
@@ -18,6 +12,12 @@ export const getBot = (botLevel: BotLevel): Bot => {
         default:
             return RandomBot
     }
+}
+
+export enum BotLevel {
+    EASY = 1,
+    MEDIUM = 2,
+    HARD = 3,
 }
 
 export interface Bot {
