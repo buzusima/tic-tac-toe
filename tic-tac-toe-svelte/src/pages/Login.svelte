@@ -4,6 +4,7 @@
 	import {
 		getGameOwnerProfile,
 		gameOwnerProfile,
+		loginWithDefaultProfile,
 	} from "../services/game-owner.svelte"
 
 	const GOOGLE_CLIENT_ID = import.meta.env.OAUTH_GOOGLE_CLIENT_ID
@@ -15,6 +16,7 @@
 		} else {
 			if (GOOGLE_CLIENT_ID)
 				authProviders.google.initialize(GOOGLE_CLIENT_ID, "signInButton")
+			else loginWithDefaultProfile()
 		}
 	})
 </script>

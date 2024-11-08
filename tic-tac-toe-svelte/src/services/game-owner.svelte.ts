@@ -2,6 +2,13 @@ import { writable, type Writable } from "svelte/store"
 
 const PLAYER_LOCAL_STORAGE_KEY = "player-profile"
 
+export const DEFAULT_OWNER_PROFILE: GameOwnerProfile = {
+    reference: "DEFAULT_REFERENCE",
+    email: "DEFAULT_EMAIL",
+    name: "John Doe",
+    picture: "",
+}
+
 const getGameOwnerProfileFromLocalStorage = () =>
 	localStorage.getItem(PLAYER_LOCAL_STORAGE_KEY)
 
@@ -28,6 +35,11 @@ export const getGameOwnerProfile = (): GameOwnerProfile | undefined => {
 
 	if (pProfile && !pProfile.reference) return undefined
 	return pProfile
+}
+
+export const loginWithDefaultProfile = () => {
+	gameOwnerProfile.set(DEFAULT_OWNER_PROFILE)
+	setGameOwnerProfileToLocalStorage(DEFAULT_OWNER_PROFILE)
 }
 
 export const processAfterGoogleLogin = (

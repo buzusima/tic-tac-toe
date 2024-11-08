@@ -3,7 +3,11 @@
 	import Board from "../components/game/Board.svelte"
 	import GameSettings from "../components/game/GameSettings.svelte"
 	import GameStatus from "../components/game/GameStatus.svelte"
-	import { gameOwnerProfile, logout } from "../services/game-owner.svelte"
+	import {
+		DEFAULT_OWNER_PROFILE,
+		gameOwnerProfile,
+		logout,
+	} from "../services/game-owner.svelte"
 	import {
 		getGame,
 		getGameSetting,
@@ -29,12 +33,12 @@
 		game = await processPoint(game!!.id, winner)
 	}
 
-	onMount(async () => {
-		if ($gameOwnerProfile) {
-			getGameSettingFunction = getGameSetting($gameOwnerProfile.reference)
-			getGameFunction = getGame($gameOwnerProfile.reference)
-		}
+	if ($gameOwnerProfile) {
+		getGameFunction = getGame($gameOwnerProfile.reference)
+		getGameSettingFunction = getGameSetting($gameOwnerProfile.reference)
+	}
 
+	onMount(async () => {
 		try {
 			gameSetting = await getGameSettingFunction
 			game = await getGameFunction
@@ -44,7 +48,7 @@
 	})
 </script>
 
-{#if $gameOwnerProfile}
+{#if $gameOwnerProfile && $gameOwnerProfile.reference !== DEFAULT_OWNER_PROFILE.reference}
 	<div class="header-container">
 		<span class="player-profile-container">{$gameOwnerProfile.name}</span>
 		<button type="button" class="logout-button" onclick={logout}>
@@ -54,9 +58,9 @@
 	</div>
 {/if}
 <div class="game-panel-container">
-	{#await getGameSettingFunction then}
-		{#await getGameFunction then}
-			{#if gameSetting && game}
+	{#await getGameFunction then}
+		{#await getGameSettingFunction then}
+			{#if game && gameSetting}
 				<div class="game-panel">
 					<div>
 						<div class="setting-contianer">
