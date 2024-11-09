@@ -1,8 +1,10 @@
 <script lang="ts">
 	import { onMount } from "svelte"
 	import Board from "../components/game/Board.svelte"
+	import GameHistory from "../components/game/GameHistory.svelte"
 	import GameSettings from "../components/game/GameSettings.svelte"
 	import GameStatus from "../components/game/GameStatus.svelte"
+	import { type Round } from "../datasources/data-provider"
 	import {
 		DEFAULT_OWNER_PROFILE,
 		gameOwnerProfile,
@@ -13,9 +15,13 @@
 		getGameSetting,
 		PlayerType,
 		processPoint,
+		setRoundWinner,
 		type GameResponse,
 		type GameSettingResponse,
 	} from "../services/game.svelte"
+
+	let board = $state<Board>()
+	let gameHistory = $state<GameHistory>()
 
 	let gameEnd = false
 	let winner = $state<PlayerType>()
@@ -25,18 +31,57 @@
 
 	let gameSetting = $state<GameSettingResponse>()
 	let game = $state<GameResponse>()
+	let currentRound = $state<Round>()
 
 	const handleOnGameEnd = async (event: any) => {
 		gameEnd = true
-		winner = event.detail
+		winner = event.detail as PlayerType
 
+		const giveBonusPoint =
+			winner === PlayerType.OWNER &&
+			game!!.ownerNumberOfConsecutiveWins + 1 == gameSetting!!.consecutiveTarget
+
+		await setRoundWinner(currentRound!!.id, winner)
 		game = await processPoint(game!!.id, winner)
+
+		alertAndResetBoard(game!!, giveBonusPoint)
 	}
 
-	if ($gameOwnerProfile) {
-		getGameFunction = getGame($gameOwnerProfile.reference)
-		getGameSettingFunction = getGameSetting($gameOwnerProfile.reference)
+	const alertAndResetBoard = (game: GameResponse, giveBonusPoint: boolean) => {
+		if (winner === PlayerType.OWNER) {
+			alertAndInitBoard(
+				giveBonusPoint
+					? "Congraturation!, you got 1 bonus point, so the point has been +2 ^^"
+					: "You win!, the point has been +1"
+			)
+		} else if (winner === PlayerType.CHALLENGER) {
+			alertAndInitBoard(
+				game.ownerPoint > 0 ? "You lose!, the point has been -1" : "You lose!"
+			)
+		} else {
+			alertAndInitBoard("Draw!")
+		}
+
+		board?.initBoard()
+		gameHistory?.reload()
+		winner = undefined
 	}
+
+	const alertAndInitBoard = async (message: string) => {
+		await new Promise((f) => setTimeout(f, 250))
+		alert(message)
+	}
+
+	const handleOnBoardCreated = (event: any) => {
+		currentRound = event.detail as Round
+	}
+
+	$effect(() => {
+		if ($gameOwnerProfile) {
+			getGameFunction = getGame($gameOwnerProfile.reference)
+			getGameSettingFunction = getGameSetting($gameOwnerProfile.reference)
+		}
+	})
 
 	onMount(async () => {
 		try {
@@ -69,7 +114,16 @@
 						<GameStatus bind:gameSetting bind:game bind:winner />
 					</div>
 					<div class="board-container">
-						<Board bind:game bind:gameSetting on:gameEnd={handleOnGameEnd} />
+						<Board
+							bind:this={board}
+							gameId={game.id}
+							bind:gameSetting
+							on:created={handleOnBoardCreated}
+							on:gameEnd={handleOnGameEnd}
+						/>
+					</div>
+					<div class="board-container">
+						<GameHistory bind:this={gameHistory} gameId={game.id} />
 					</div>
 				</div>
 			{/if}

@@ -1,6 +1,8 @@
 import type { BotLevel } from "../bots/bot"
-import { localGameConnector } from "./local-storage/game"
-import { localGameSettingConnector } from "./local-storage/game-config"
+import type { MarkerType, PlayerType } from "../services/game.svelte"
+import { localGameRoundConnector } from "./local-storage/game-rounds"
+import { localGameSettingConnector } from "./local-storage/game-settings"
+import { localGameConnector } from "./local-storage/games"
 
 export interface GameSettingDataProvider {
 	getGameSettingByGameOwnerId: (ownerId: string) => Promise<GameSetting>
@@ -27,9 +29,36 @@ export interface GameDataProvider {
 	addChallengerPoint: (gameId: string) => Promise<Game>
 }
 
+export interface RoundDataProvider {
+	getRoundsByGameId: (gameId: string) => Promise<Round[]>
+	createRoundByGameId: (gameId: string, gameSize: number) => Promise<Round>
+	setWinnerByRoundId: (roundId: string, winner: PlayerType) => Promise<Round>
+}
+
+export interface MarkDataProvider {
+	getMarksByRoundId: (roundId: string) => Promise<Mark[]>
+	createMark: (roundId: string) => Promise<Mark>
+}
+
 export enum ChallengerType {
 	BOT = 1,
 	PLAYER = 2,
+}
+
+export interface Mark {
+	id: string
+	roundId: string
+	x: number
+	y: number
+	markerType: MarkerType
+}
+
+export interface Round {
+	id: string
+	gameId: string
+	gameSize: number
+	winner: PlayerType | undefined
+	gameEnd: boolean
 }
 
 export interface GameSetting {
@@ -50,9 +79,11 @@ export interface Game {
 }
 
 //TODO: Read data API source from process env and do condition in the below
-const gameSettingConnector: GameSettingDataProvider = localGameSettingConnector
+const gameSettingConnector: GameSettingDataProvider = localGameSettingConnector //TODO: import.meta.env.DATA_SOURCE == API_SERVICE ? apiServiceGameSettingConnector : localGameSettingConnector
 const gameConnector: GameDataProvider = localGameConnector
+const gameRoundConnector: RoundDataProvider = localGameRoundConnector
 
+// -------------- Game Setting ----------------
 export const getGameSettingByGameOwnerId = (ownerId: string) =>
 	gameSettingConnector.getGameSettingByGameOwnerId(ownerId)
 export const createGameSettingByGameOwnerId = (
@@ -75,6 +106,7 @@ export const setGameSettingById = (
 	gameSize: number
 ) => gameSettingConnector.setGameSettingById(id, challengerType, gameSize)
 
+// -------------- Game ----------------
 export const getGameByGameOwnerId = (ownerId: string) =>
 	gameConnector.getGameByGameOwnerId(ownerId)
 export const createGameByGameOwnerId = (ownerId: string) =>
@@ -87,3 +119,11 @@ export const resetGameOwnerNumberOfConsecutiveWins = (gameId: string) =>
 	gameConnector.resetGameOwnerNumberOfConsecutiveWins(gameId)
 export const addChallengerPoint = (gameId: string) =>
 	gameConnector.addChallengerPoint(gameId)
+
+// -------------- Round ----------------
+export const getRoundsByGameId = (gameId: string) =>
+	gameRoundConnector.getRoundsByGameId(gameId)
+export const createRoundByGameId = (gameId: string, gameSize: number) =>
+	gameRoundConnector.createRoundByGameId(gameId, gameSize)
+export const setWinnerByRoundId = (roundId: string, winner: PlayerType) =>
+	gameRoundConnector.setWinnerByRoundId(roundId, winner)

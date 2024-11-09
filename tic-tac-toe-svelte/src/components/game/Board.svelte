@@ -4,18 +4,18 @@
 	import { getBot, type Bot } from "../../bots/bot"
 	import { ChallengerType } from "../../datasources/data-provider"
 	import {
+		createRound,
 		MarkerType,
 		PlayerType,
-		type GameResponse,
 		type GameSettingResponse,
 	} from "../../services/game.svelte"
 
 	let {
+		gameId,
 		gameSetting = $bindable(),
-		game = $bindable(),
 	}: {
+		gameId: string
 		gameSetting: GameSettingResponse
-		game: GameResponse
 	} = $props()
 
 	const dispatch = createEventDispatcher()
@@ -33,7 +33,7 @@
 		if (gameSetting) initBoard()
 	})
 
-	const initBoard = async () => {
+	export const initBoard = async () => {
 		gameBoard = generateBoard(gameSetting.gameSize)
 		winningCombinations = generateWinningCombinations(gameSetting.gameSize)
 		bot = getBot(gameSetting.botLevel)
@@ -41,6 +41,10 @@
 		winnerMarkerType = undefined
 		winnerCombination = undefined
 		currentMarkerType = MarkerType.X
+
+		const round = await createRound(gameId, gameSetting.gameSize)
+
+		dispatch("created", round)
 	}
 
 	const generateBoard = (size: number): MarkerType[][] => {
@@ -135,12 +139,6 @@
 		}
 	}
 
-	const alertAndInitBoard = async (message: string) => {
-		await new Promise((f) => setTimeout(f, 250))
-		alert(message)
-		initBoard()
-	}
-
 	const processAfterCellClick = async () => {
 		winnerMarkerType = checkWinner(gameBoard!!, currentMarkerType)
 
@@ -152,25 +150,11 @@
 					? PlayerType.OWNER
 					: PlayerType.CHALLENGER
 			)
-
-			if (winnerMarkerType === MarkerType.X) {
-				alertAndInitBoard(
-					game.ownerNumberOfConsecutiveWins + 1 == gameSetting.consecutiveTarget
-						? "Congraturation!, you got 1 bonus point, so the point has been +2 ^^"
-						: "You win!, the point has been +1"
-				)
-			} else {
-				alertAndInitBoard(
-					game.ownerPoint > 0 ? "You lose!, the point has been -1" : "You lose!"
-				)
-			}
 		} else {
 			const draw = isDraw(gameBoard!!)
 			if (draw) {
 				gameFreezed = true
 				dispatch("gameEnd")
-
-				alertAndInitBoard("Draw!")
 			} else {
 				currentMarkerType = switchMarker(currentMarkerType)
 				if (currentMarkerType === MarkerType.O) challengerTurn(gameBoard!!)

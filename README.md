@@ -36,7 +36,8 @@ This project is currently at the MVP (Minimum Viable Product) stage. Planned fea
 1. Adjustable game size - Done
 2. Game owner vs challenger concept - Done
 3. Change player type BOT/Player - Done
-4. Game history
+4. Game round
+   - Change get game setting by game id
 5. Bot difficulty levels
 6. Unit testing
 7. Backend server integration with an SQLite database

@@ -4,11 +4,15 @@ import {
 	ChallengerType,
 	createGameByGameOwnerId,
 	createGameSettingByGameOwnerId,
+	createRoundByGameId,
 	getGameByGameOwnerId,
 	getGameSettingByGameOwnerId,
+	getRoundsByGameId,
 	minusGameOwnerPoint,
 	resetGameOwnerNumberOfConsecutiveWins,
 	setGameSettingById,
+	setWinnerByRoundId,
+	type Round,
 } from "../datasources/data-provider"
 
 export enum PlayerType {
@@ -81,6 +85,24 @@ export const processPoint = async (
 	} else {
 		return resetGameOwnerNumberOfConsecutiveWins(gameId)
 	}
+}
+
+export const createRound = async (
+	gameId: string,
+	gameSize: number
+): Promise<Round> => {
+	return createRoundByGameId(gameId, gameSize)
+}
+
+export const getRounds = async (gameId: string): Promise<Round[]> => {
+	return getRoundsByGameId(gameId)
+}
+
+export const setRoundWinner = async (
+	roundId: string,
+	winner: PlayerType
+): Promise<Round> => {
+	return setWinnerByRoundId(roundId, winner)
 }
 
 export interface GameSettingResponse {
