@@ -1,3 +1,4 @@
+import type { BotLevel } from "../bots/bot"
 import {
 	addChallengerPoint,
 	addGameOwnerPoint,
@@ -32,7 +33,7 @@ export enum MarkerType {
 const DEFAULT_GAME_CONFIG = {
 	consecutiveTarget: 3,
 	challengerType: ChallengerType.BOT,
-	botLevel: 1,
+	botLevel: 2,
 	gameSize: 3,
 }
 
@@ -67,9 +68,10 @@ export const getGameSetting = async (
 export const setGameSetting = (
 	id: string,
 	challengerType: ChallengerType,
+	botLevel: BotLevel,
 	gameSize: number
 ): Promise<GameSettingResponse> => {
-	return setGameSettingById(id, challengerType, gameSize)
+	return setGameSettingById(id, challengerType, botLevel, gameSize)
 }
 
 export const processPoint = async (

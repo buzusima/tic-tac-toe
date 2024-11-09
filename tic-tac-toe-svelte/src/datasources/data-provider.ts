@@ -17,6 +17,7 @@ export interface GameSettingDataProvider {
 	setGameSettingById: (
 		id: string,
 		challengerType: ChallengerType,
+		botLevel: BotLevel,
 		gameSize: number
 	) => Promise<GameSetting>
 }
@@ -110,8 +111,15 @@ export const createGameSettingByGameOwnerId = (
 export const setGameSettingById = (
 	id: string,
 	challengerType: ChallengerType,
+	botLevel: BotLevel,
 	gameSize: number
-) => gameSettingConnector.setGameSettingById(id, challengerType, gameSize)
+) =>
+	gameSettingConnector.setGameSettingById(
+		id,
+		challengerType,
+		botLevel,
+		gameSize
+	)
 
 // -------------- Game ----------------
 export const getGameByGameOwnerId = (ownerId: string) =>

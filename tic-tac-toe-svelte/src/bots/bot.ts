@@ -1,4 +1,5 @@
 import type { MarkerType } from "../services/game.svelte"
+import { LogicBot } from "./logic-bot"
 import { RandomBot } from "./random-bot"
 
 export const getBot = (botLevel: BotLevel): Bot => {
@@ -6,7 +7,7 @@ export const getBot = (botLevel: BotLevel): Bot => {
 		case BotLevel.EASY:
 			return RandomBot
 		case BotLevel.MEDIUM:
-		// return new LogicBot()
+			return LogicBot
 		case BotLevel.HARD:
 		// return new AiBot()
 		default:
@@ -21,5 +22,8 @@ export enum BotLevel {
 }
 
 export interface Bot {
-	selectCell(board: MarkerType[][]): [number, number]
+	selectCell(
+		board: MarkerType[][],
+		winningCombinations?: number[][][]
+	): [number, number]
 }
