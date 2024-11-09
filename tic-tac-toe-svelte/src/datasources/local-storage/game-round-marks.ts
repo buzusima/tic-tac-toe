@@ -35,8 +35,8 @@ export const localGameRoundMarkConnector: MarkDataProvider = {
 
 	createRoundMarkByRoundId: (
 		roundId: string,
-		x: number,
-		y: number,
+		rowIndex: number,
+		colIndex: number,
 		markerType: MarkerType
 	): Promise<Mark> => {
 		const gameRoundMarks = findAllGameRoundMarks()
@@ -44,8 +44,8 @@ export const localGameRoundMarkConnector: MarkDataProvider = {
 		const newRoumdMark: Mark = {
 			id: uuidv4(),
 			roundId: roundId,
-			x: x,
-			y: y,
+			rowIndex: rowIndex,
+			colIndex: colIndex,
 			markerType: markerType,
 		}
 

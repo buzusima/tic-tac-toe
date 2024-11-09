@@ -11,16 +11,16 @@
 	}
 
 	let getRoundsFunction = $state<Promise<Round[]>>()
-	let diplayingRoundId = $state<string>("")
+	let diplayingRound = $state<Round>()
 	let showModal = $state<boolean>(false)
 
-	const openReplayModal = (roundId: string) => {
-		diplayingRoundId = roundId
+	const openReplayModal = (round: Round) => {
+		diplayingRound = round
 		showModal = true
 	}
 
 	const handleOnModalClose = () => {
-		diplayingRoundId = ""
+		diplayingRound = undefined
 		showModal = false
 	}
 
@@ -53,17 +53,19 @@
 							{round.winner === PlayerType.OWNER ? "You" : "Challenger"}
 						</td>
 						<td>
-							<button onclick={() => openReplayModal(round.id)}>Replay</button>
+							<button onclick={() => openReplayModal(round)}>Replay</button>
 						</td>
 					</tr>
 				{/each}
 			</tbody>
 		</table>
-		<GameReplayModal
-			bind:showModal
-			roundId={diplayingRoundId}
-			on:close={handleOnModalClose}
-		/>
+		{#if diplayingRound}
+			<GameReplayModal
+				bind:showModal
+				round={diplayingRound}
+				on:close={handleOnModalClose}
+			/>
+		{/if}
 	{/if}
 {/await}
 

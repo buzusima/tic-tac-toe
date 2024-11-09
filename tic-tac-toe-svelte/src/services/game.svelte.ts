@@ -108,17 +108,17 @@ export const setRoundWinner = async (
 	return setWinnerByRoundId(roundId, winner)
 }
 
-export const getRoundMarks = (roundId: string): Promise<Mark[]> => {
+export const getRoundMarks = async (roundId: string): Promise<Mark[]> => {
 	return getRoundMarksByRoundId(roundId)
 }
 
 export const createRoundMark = (
 	roundId: string,
-	x: number,
-	y: number,
+	rowIndex: number,
+	colIndex: number,
 	markerType: MarkerType
 ) => {
-	return createRoundMarkByRoundId(roundId, x, y, markerType)
+	return createRoundMarkByRoundId(roundId, rowIndex, colIndex, markerType)
 }
 
 export interface GameSettingResponse {

@@ -40,8 +40,8 @@ export interface MarkDataProvider {
 	getRoundMarksByRoundId: (roundId: string) => Promise<Mark[]>
 	createRoundMarkByRoundId: (
 		roundId: string,
-		x: number,
-		y: number,
+		rowIndex: number,
+		colIndex: number,
 		markerType: MarkerType
 	) => Promise<Mark>
 }
@@ -54,8 +54,8 @@ export enum ChallengerType {
 export interface Mark {
 	id: string
 	roundId: string
-	x: number
-	y: number
+	rowIndex: number
+	colIndex: number
 	markerType: MarkerType
 }
 

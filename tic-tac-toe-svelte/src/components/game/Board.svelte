@@ -2,13 +2,18 @@
 	import { createEventDispatcher } from "svelte"
 	import { fade } from "svelte/transition"
 	import { getBot, type Bot } from "../../bots/bot"
-	import { ChallengerType } from "../../datasources/data-provider"
+	import { ChallengerType, type Round } from "../../datasources/data-provider"
 	import {
 		createRound,
+		createRoundMark,
 		MarkerType,
 		PlayerType,
 		type GameSettingResponse,
 	} from "../../services/game.svelte"
+	import {
+		generateBoard,
+		generateWinningCombinations,
+	} from "../../services/board.svelte"
 
 	let {
 		gameId,
@@ -26,7 +31,9 @@
 	let gameFreezed = $state<boolean>(false)
 	let winnerMarkerType = $state<MarkerType>()
 	let winnerCombination = $state<number[][]>()
-	let currentMarkerType: MarkerType = MarkerType.X
+	let currentMarkerType = $state<MarkerType>(MarkerType.X)
+	let currentRound = $state<Round>()
+
 	let bot = $state<Bot>()
 
 	$effect(() => {
@@ -42,58 +49,9 @@
 		winnerCombination = undefined
 		currentMarkerType = MarkerType.X
 
-		const round = await createRound(gameId, gameSetting.gameSize)
+		currentRound = await createRound(gameId, gameSetting.gameSize)
 
-		dispatch("created", round)
-	}
-
-	const generateBoard = (size: number): MarkerType[][] => {
-		const board: MarkerType[][] = []
-
-		for (let i = 0; i < size; i++) {
-			const row = new Array(size).fill(MarkerType.EMPTY)
-			board.push(row)
-		}
-
-		return board
-	}
-
-	const generateWinningCombinations = (size: number): number[][][] => {
-		const combinations: number[][][] = []
-
-		// Rows
-		for (let row = 0; row < size; row++) {
-			const rowCombination = []
-			for (let col = 0; col < size; col++) {
-				rowCombination.push([row, col])
-			}
-			combinations.push(rowCombination)
-		}
-
-		// Columns
-		for (let col = 0; col < size; col++) {
-			const colCombination = []
-			for (let row = 0; row < size; row++) {
-				colCombination.push([row, col])
-			}
-			combinations.push(colCombination)
-		}
-
-		// Diagonal (top-left to bottom-right)
-		const diagonal1 = []
-		for (let i = 0; i < size; i++) {
-			diagonal1.push([i, i])
-		}
-		combinations.push(diagonal1)
-
-		// Diagonal (top-right to bottom-left)
-		const diagonal2 = []
-		for (let i = 0; i < size; i++) {
-			diagonal2.push([i, size - i - 1])
-		}
-		combinations.push(diagonal2)
-
-		return combinations
+		dispatch("created", currentRound)
 	}
 
 	const checkWinner = (
@@ -124,7 +82,7 @@
 		const [rowIndex, colIndex] = bot!!.selectCell(board)
 		gameBoard!![rowIndex][colIndex] = currentMarkerType
 
-		processAfterCellClick()
+		processAfterCellClick(rowIndex, colIndex)
 	}
 
 	const handleOnCellClick = (rowIndex: number, colIndex: number) => {
@@ -135,11 +93,12 @@
 		) {
 			gameBoard[rowIndex][colIndex] = currentMarkerType
 
-			processAfterCellClick()
+			processAfterCellClick(rowIndex, colIndex)
 		}
 	}
 
-	const processAfterCellClick = async () => {
+	const processAfterCellClick = async (rowIndex: number, colIndex: number) => {
+		createRoundMark(currentRound!!.id, rowIndex, colIndex, currentMarkerType)
 		winnerMarkerType = checkWinner(gameBoard!!, currentMarkerType)
 
 		if (winnerMarkerType) {
