@@ -5,13 +5,16 @@ import {
 	createGameByGameOwnerId,
 	createGameSettingByGameOwnerId,
 	createRoundByGameId,
+	createRoundMarkByRoundId,
 	getGameByGameOwnerId,
 	getGameSettingByGameOwnerId,
+	getRoundMarksByRoundId,
 	getRoundsByGameId,
 	minusGameOwnerPoint,
 	resetGameOwnerNumberOfConsecutiveWins,
 	setGameSettingById,
 	setWinnerByRoundId,
+	type Mark,
 	type Round,
 } from "../datasources/data-provider"
 
@@ -103,6 +106,19 @@ export const setRoundWinner = async (
 	winner: PlayerType
 ): Promise<Round> => {
 	return setWinnerByRoundId(roundId, winner)
+}
+
+export const getRoundMarks = (roundId: string): Promise<Mark[]> => {
+	return getRoundMarksByRoundId(roundId)
+}
+
+export const createRoundMark = (
+	roundId: string,
+	x: number,
+	y: number,
+	markerType: MarkerType
+) => {
+	return createRoundMarkByRoundId(roundId, x, y, markerType)
 }
 
 export interface GameSettingResponse {

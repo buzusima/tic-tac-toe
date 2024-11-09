@@ -1,5 +1,6 @@
 import type { BotLevel } from "../bots/bot"
 import type { MarkerType, PlayerType } from "../services/game.svelte"
+import { localGameRoundMarkConnector } from "./local-storage/game-round-marks"
 import { localGameRoundConnector } from "./local-storage/game-rounds"
 import { localGameSettingConnector } from "./local-storage/game-settings"
 import { localGameConnector } from "./local-storage/games"
@@ -36,8 +37,13 @@ export interface RoundDataProvider {
 }
 
 export interface MarkDataProvider {
-	getMarksByRoundId: (roundId: string) => Promise<Mark[]>
-	createMark: (roundId: string) => Promise<Mark>
+	getRoundMarksByRoundId: (roundId: string) => Promise<Mark[]>
+	createRoundMarkByRoundId: (
+		roundId: string,
+		x: number,
+		y: number,
+		markerType: MarkerType
+	) => Promise<Mark>
 }
 
 export enum ChallengerType {
@@ -82,6 +88,7 @@ export interface Game {
 const gameSettingConnector: GameSettingDataProvider = localGameSettingConnector //TODO: import.meta.env.DATA_SOURCE == API_SERVICE ? apiServiceGameSettingConnector : localGameSettingConnector
 const gameConnector: GameDataProvider = localGameConnector
 const gameRoundConnector: RoundDataProvider = localGameRoundConnector
+const gameMarkConnector: MarkDataProvider = localGameRoundMarkConnector
 
 // -------------- Game Setting ----------------
 export const getGameSettingByGameOwnerId = (ownerId: string) =>
@@ -127,3 +134,13 @@ export const createRoundByGameId = (gameId: string, gameSize: number) =>
 	gameRoundConnector.createRoundByGameId(gameId, gameSize)
 export const setWinnerByRoundId = (roundId: string, winner: PlayerType) =>
 	gameRoundConnector.setWinnerByRoundId(roundId, winner)
+
+// -------------- Mark ----------------
+export const getRoundMarksByRoundId = (roundId: string) =>
+	gameMarkConnector.getRoundMarksByRoundId(roundId)
+export const createRoundMarkByRoundId = (
+	roundId: string,
+	x: number,
+	y: number,
+	markerType: MarkerType
+) => gameMarkConnector.createRoundMarkByRoundId(roundId, x, y, markerType)

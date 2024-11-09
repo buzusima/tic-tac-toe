@@ -6,8 +6,8 @@ const ROUNDS_KEY = "rounds"
 
 const getGameRounds = () => localStorage.getItem(ROUNDS_KEY)
 
-const setGameRounds = (games: Round[]) =>
-	localStorage.setItem(ROUNDS_KEY, JSON.stringify(games))
+const setGameRounds = (rounds: Round[]) =>
+	localStorage.setItem(ROUNDS_KEY, JSON.stringify(rounds))
 
 const findAllGameRounds = (): Round[] => {
 	const gameRounesJson = getGameRounds()

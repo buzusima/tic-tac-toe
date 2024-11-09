@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { onMount } from "svelte"
-	import { getRounds, PlayerType } from "../../services/game.svelte"
 	import type { Round } from "../../datasources/data-provider"
+	import { getRounds, PlayerType } from "../../services/game.svelte"
+	import GameReplayModal from "./GameReplayModal.svelte"
 
 	let { gameId }: { gameId: string } = $props()
 
@@ -10,6 +11,18 @@
 	}
 
 	let getRoundsFunction = $state<Promise<Round[]>>()
+	let diplayingRoundId = $state<string>("")
+	let showModal = $state<boolean>(false)
+
+	const openReplayModal = (roundId: string) => {
+		diplayingRoundId = roundId
+		showModal = true
+	}
+
+	const handleOnModalClose = () => {
+		diplayingRoundId = ""
+		showModal = false
+	}
 
 	onMount(() => {
 		getRoundsFunction = getRounds(gameId)
@@ -40,12 +53,17 @@
 							{round.winner === PlayerType.OWNER ? "You" : "Challenger"}
 						</td>
 						<td>
-							<button>Replay</button>
+							<button onclick={() => openReplayModal(round.id)}>Replay</button>
 						</td>
 					</tr>
 				{/each}
 			</tbody>
 		</table>
+		<GameReplayModal
+			bind:showModal
+			roundId={diplayingRoundId}
+			on:close={handleOnModalClose}
+		/>
 	{/if}
 {/await}
 

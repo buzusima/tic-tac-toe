@@ -1,36 +1,58 @@
-// import { v4 as uuidv4 } from "uuid"
-// import type { Game, GameDataProvider, Mark, MarkDataProvider } from "../data-provider"
+import { v4 as uuidv4 } from "uuid"
+import { MarkerType } from "../../services/game.svelte"
+import type { Mark, MarkDataProvider } from "../data-provider"
 
-// const GAMES_KEY = "games"
+const MARKS_KEY = "mark"
 
-// const getGameTurns = () => localStorage.getItem(GAMES_KEY)
+const getGameRoundMarks = () => localStorage.getItem(MARKS_KEY)
 
-// const setGameTurns = (games: Game[]) =>
-//   localStorage.setItem(GAMES_KEY, JSON.stringify(games))
+const setGameRoundMarks = (marks: Mark[]) =>
+	localStorage.setItem(MARKS_KEY, JSON.stringify(marks))
 
+const findAllGameRoundMarks = (): Mark[] => {
+	const gameRounesJson = getGameRoundMarks()
 
-// const findAllGameTurns = (): Game[] => {
-//   const gamesJson = getGameTurns()
+	if (gameRounesJson) return JSON.parse(gameRounesJson)
 
-//   if (gamesJson) return JSON.parse(gamesJson)
+	return []
+}
 
-//   return []
-// }
+const findGameRoundMarksByRoundId = (
+	gameRoundMarks: Mark[],
+	roundId: string
+): Mark[] => gameRoundMarks.filter((mark) => mark.roundId == roundId)
 
-// const findGameTurnByGameOwnerId = (games: Game[], ownerId: string): Game =>
-//   games.find((game) => game.ownerId == ownerId)
+export const localGameRoundMarkConnector: MarkDataProvider = {
+	getRoundMarksByRoundId: (roundId: string): Promise<Mark[]> => {
+		const gameRoundMarks = findAllGameRoundMarks()
+		const gameRoundMarksOfId = findGameRoundMarksByRoundId(
+			gameRoundMarks,
+			roundId
+		)
 
-// export const localGameMarkConnector: MarkDataProvider = {
-// 	getMarksByRoundId: function (roundId: string): Promise<Mark[]> {
-// 		const gameRoundsJson = getGameRounds()
+		return Promise.resolve(gameRoundMarksOfId)
+	},
 
-// 		let gameRounds: Mark[] | undefined
-// 		if (gameRoundsJson) gameRounds = JSON.parse(gameRoundsJson)
-// 		if (!gameRounds) return Promise.reject(new Error("Game round not found"))
+	createRoundMarkByRoundId: (
+		roundId: string,
+		x: number,
+		y: number,
+		markerType: MarkerType
+	): Promise<Mark> => {
+		const gameRoundMarks = findAllGameRoundMarks()
 
-// 		return Promise.resolve(findGameRoundsByGameId(gameRounds, gameId))
-// 	},
-// 	createRound: function (gameId: string): Promise<Round> {
-// 		throw new Error("Function not implemented.")
-// 	},
-// }
+		const newRoumdMark: Mark = {
+			id: uuidv4(),
+			roundId: roundId,
+			x: x,
+			y: y,
+			markerType: markerType,
+		}
+
+		gameRoundMarks.push(newRoumdMark)
+
+		setGameRoundMarks(gameRoundMarks)
+
+		return Promise.resolve(newRoumdMark)
+	},
+}
