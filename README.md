@@ -1,5 +1,5 @@
 # Tic Tac Toe
-Experience the classic game of Tic Tac Toe with customizable options! Choose your board size for varied challenges, and decide whether to play against a friend or a bot. 
+Experience the classic game of Tic Tac Toe with customizable options! Choose your board size for varied challenges, and decide whether to play against a friend or a bot. With adjustable bot difficulty levels from easy to medium.
 
 ### Prerequisite
 The game uses an OAuth login system, requiring game owner to sign in using Google. To enable this feature, obtain the GOOGLE_CLIENT_ID from Google and add it to the configuration file before running the game.
