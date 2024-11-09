@@ -79,7 +79,7 @@
 		await new Promise((f) => setTimeout(f, 500)) // Bot think
 		gameFreezed = false
 
-		const [rowIndex, colIndex] = bot!!.selectCell(board)
+		const [rowIndex, colIndex] = bot!!.selectCell(board, winningCombinations)
 		gameBoard!![rowIndex][colIndex] = currentMarkerType
 
 		processAfterCellClick(rowIndex, colIndex)
