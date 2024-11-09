@@ -29,19 +29,18 @@ If a GOOGLE_CLIENT_ID is not provided, the game will not require authentication,
         consecutiveWin resets to 0.
 
 # Coding concept
-TODO
+1. Create a board with empty value
+2. Generate winning combination
+    - Rows: Any of the three horizontal rows filled by the same player's mark.
+    - Columns: Any of the three vertical columns filled by the same player's mark.
+    - Diagonals: Either of the two diagonals filled by the same player's mark.
+3. Check with winning combination every cell selected
 
-# Disclaimer
-This project is currently at the MVP (Minimum Viable Product) stage. Planned features and improvements include:
-1. Adjustable game size - Done
-2. Game owner vs challenger concept - Done
-3. Change player type BOT/Player - Done
-4. Game round
-   - Change get game setting by game id
-   - createEventDispatcher deprecated
-5. Bot difficulty levels
-6. Unit testing
-7. Backend server integration with an SQLite database
-8. Docker setup
-9. UI Improvements
+# Improvement target
+1. Change get game setting by game id
+2. Fix createEventDispatcher deprecated
+3. Unit testing
+4. Backend server integration with an SQLite database
+5. Docker setup
+6. UI Improvements
 
