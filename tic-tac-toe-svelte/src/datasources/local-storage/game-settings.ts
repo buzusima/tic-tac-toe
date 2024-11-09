@@ -73,6 +73,7 @@ export const localGameSettingConnector: GameSettingDataProvider = {
 	setGameSettingById: (
 		id: string,
 		challengerType: ChallengerType,
+		botLevel: BotLevel,
 		gameSize: number
 	): Promise<GameSetting> => {
 		let gameSettings = findAllGameSettings()
@@ -83,6 +84,7 @@ export const localGameSettingConnector: GameSettingDataProvider = {
 		if (gameSettingIndex == -1) Promise.reject("Game setting not found")
 
 		gameSettings[gameSettingIndex].challengerType = challengerType
+		gameSettings[gameSettingIndex].botLevel = botLevel
 		gameSettings[gameSettingIndex].gameSize = gameSize
 
 		setGameSettings(gameSettings)

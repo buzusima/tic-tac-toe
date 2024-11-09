@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { BotLevel } from "../../bots/bot"
 	import { ChallengerType } from "../../datasources/data-provider"
 	import {
 		setGameSetting,
@@ -25,9 +26,15 @@
 		const data = new FormData(event.currentTarget)
 
 		const challenger: ChallengerType = Number(data.get("challenger"))
+		const botLevel: BotLevel = Number(data.get("botLevel"))
 		const gameSize: number = Number(data.get("gameSize"))
 
-		gameSetting = await setGameSetting(gameSetting.id, challenger, gameSize)
+		gameSetting = await setGameSetting(
+			gameSetting.id,
+			challenger,
+			botLevel,
+			gameSize
+		)
 		dialog?.close()
 	}
 </script>
@@ -56,6 +63,26 @@
 				checked
 			/>
 			<label for="bot">BOT</label><br />
+			<div class="bot-level-container">
+				<input
+					type="radio"
+					id="random-bot"
+					name="botLevel"
+					disabled={gameSetting.challengerType !== ChallengerType.BOT}
+					bind:group={gameSetting.botLevel}
+					value={BotLevel.EASY}
+				/>
+				<label for="random-bot">Easy</label><br />
+				<input
+					type="radio"
+					id="logic-bot"
+					name="botLevel"
+					disabled={gameSetting.challengerType !== ChallengerType.BOT}
+					bind:group={gameSetting.botLevel}
+					value={BotLevel.MEDIUM}
+				/>
+				<label for="logic-bot">Medium</label><br />
+			</div>
 			<input
 				type="radio"
 				id="player"
@@ -88,6 +115,9 @@
 		border-radius: 0.375rem;
 		border: none;
 
+		.bot-level-container {
+			padding-left: 1rem;
+		}
 		.submit-button-container {
 			display: flex;
 			justify-content: end;
