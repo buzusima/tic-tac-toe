@@ -1,8 +1,8 @@
 # Tic Tac Toe
-This game mode features Player vs. Bot only. The player is designated as "X," and the bot is designated as "O."
+Experience the classic game of Tic Tac Toe with customizable options! Choose your board size for varied challenges, and decide whether to play against a friend or a bot. 
 
 ### Prerequisite
-The game uses an OAuth login system, requiring players to sign in using Google. To enable this feature, obtain the GOOGLE_CLIENT_ID from Google and add it to the configuration file before running the game.
+The game uses an OAuth login system, requiring game owner to sign in using Google. To enable this feature, obtain the GOOGLE_CLIENT_ID from Google and add it to the configuration file before running the game.
 
 For guidance on obtaining the GOOGLE_CLIENT_ID, please follow this link: https://support.google.com/cloud/answer/6158849?hl=en
 
@@ -31,12 +31,13 @@ If a GOOGLE_CLIENT_ID is not provided, the game will not require authentication,
 # Coding concept
 1. Create a board with empty value
 2. Generate winning combination
-    - Rows: Any of the three horizontal rows filled by the same player's mark.
-    - Columns: Any of the three vertical columns filled by the same player's mark.
-    - Diagonals: Either of the two diagonals filled by the same player's mark.
+    - Rows: Any of the three horizontal rows filled by the same game owner's mark.
+    - Columns: Any of the three vertical columns filled by the same game owner's mark.
+    - Diagonals: Either of the two diagonals filled by the same game owner's mark.
 3. Check with winning combination every cell selected
 
 # Improvement target
+1. Bot
 1. Change get game setting by game id
 2. Fix createEventDispatcher deprecated
 3. Unit testing
