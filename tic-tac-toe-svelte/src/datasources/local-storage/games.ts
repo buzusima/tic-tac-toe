@@ -81,7 +81,7 @@ export const localGameConnector: GameDataProvider = {
 		const gameIndex = findGameIndexById(games, gameId)
 		if (gameIndex == -1) Promise.reject("Game not found")
 
-		games[gameIndex].ownerPoint -= 1
+		if (games[gameIndex].ownerPoint > 0) games[gameIndex].ownerPoint -= 1
 
 		setGames(games)
 
