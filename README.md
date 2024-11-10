@@ -38,10 +38,10 @@ If a GOOGLE_CLIENT_ID is not provided, the game will not require authentication,
 
 # Improvement target
 - Change get game setting by game id - Done
-- Responsive & decoration of History
 - Unit testing
+- Responsive & decoration of History
 - AI Bot
-- Backend server integration with an SQLite database
+- Backend server integration with an SQLite database using NestJS
 - Docker setup
 - UI Improvements
 
