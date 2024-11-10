@@ -37,8 +37,7 @@ If a GOOGLE_CLIENT_ID is not provided, the game will not require authentication,
 3. Check with winning combination every cell selected
 
 # Improvement target
-- Logic Bot
-- Change get game setting by game id
+- Change get game setting by game id - Done
 - Responsive & decoration of History
 - Unit testing
 - AI Bot
