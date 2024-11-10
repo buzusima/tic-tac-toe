@@ -8,10 +8,10 @@ import { localGameConnector } from "./local-storage/games"
 export interface GameDataProvider {
 	getGameByGameOwnerId: (ownerId: string) => Promise<Game>
 	createGameByGameOwnerId: (ownerId: string) => Promise<Game>
-	addGameOwnerPoint: (gameId: string) => Promise<Game>
-	minusGameOwnerPoint: (gameId: string) => Promise<Game>
-	resetGameOwnerNumberOfConsecutiveWins: (gameId: string) => Promise<Game>
-	addChallengerPoint: (gameId: string) => Promise<Game>
+	processWinner: (
+		gameId: string,
+		winner: PlayerType | null
+	) => Promise<Game>
 }
 
 export interface GameSettingDataProvider {
@@ -126,14 +126,10 @@ export const getGameByGameOwnerId = (ownerId: string) =>
 	gameConnector.getGameByGameOwnerId(ownerId)
 export const createGameByGameOwnerId = (ownerId: string) =>
 	gameConnector.createGameByGameOwnerId(ownerId)
-export const addGameOwnerPoint = (gameId: string) =>
-	gameConnector.addGameOwnerPoint(gameId)
-export const minusGameOwnerPoint = (gameId: string) =>
-	gameConnector.minusGameOwnerPoint(gameId)
-export const resetGameOwnerNumberOfConsecutiveWins = (gameId: string) =>
-	gameConnector.resetGameOwnerNumberOfConsecutiveWins(gameId)
-export const addChallengerPoint = (gameId: string) =>
-	gameConnector.addChallengerPoint(gameId)
+export const processWinner = (
+	gameId: string,
+	winner: PlayerType | null
+) => gameConnector.processWinner(gameId, winner)
 
 // -------------- Round ----------------
 export const getRoundsByGameId = (gameId: string) =>

@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from "uuid"
 import type { Game, GameDataProvider } from "../data-provider"
+import { PlayerType } from "../../services/game.svelte"
 
 const GAMES_KEY = "games"
 
@@ -23,6 +24,48 @@ const findGameByGameOwnerId = (
 
 const findGameIndexById = (games: Game[], id: string): number =>
 	games.findIndex((game) => game.id == id)
+
+const addGameOwnerPoint = (games: Game[], gameIndex: number): Game => {
+	games[gameIndex].ownerNumberOfConsecutiveWins += 1
+	games[gameIndex].ownerPoint += 1
+
+	if (games[gameIndex].ownerNumberOfConsecutiveWins >= 3) {
+		games[gameIndex].ownerNumberOfConsecutiveWins = 0
+		games[gameIndex].ownerPoint += 1
+	}
+
+	setGames(games)
+
+	return games[gameIndex]
+}
+
+const minusGameOwnerPoint = (games: Game[], gameIndex: number): Game => {
+	if (games[gameIndex].ownerPoint > 0) games[gameIndex].ownerPoint -= 1
+
+	setGames(games)
+
+	return games[gameIndex]
+}
+
+const resetGameOwnerNumberOfConsecutiveWins = (
+	games: Game[],
+	gameIndex: number
+): Game => {
+	games[gameIndex].ownerNumberOfConsecutiveWins = 0
+
+	setGames(games)
+
+	return games[gameIndex]
+}
+
+const addChallengerPoint = (games: Game[], gameIndex: number): Game[] => {
+	games[gameIndex].challengerPoint += 1
+	games[gameIndex].ownerNumberOfConsecutiveWins = 0
+
+	setGames(games)
+
+	return games
+}
 
 export const localGameConnector: GameDataProvider = {
 	getGameByGameOwnerId: (ownerId: string): Promise<Game> => {
@@ -54,66 +97,29 @@ export const localGameConnector: GameDataProvider = {
 		return Promise.resolve(newGame)
 	},
 
-	addGameOwnerPoint: (gameId: string): Promise<Game> => {
+	processWinner: (
+		gameId: string,
+		winner: PlayerType | null
+	): Promise<Game> => {
 		let games = findAllGames()
 		if (!games) Promise.reject("Game not found")
 
 		const gameIndex = findGameIndexById(games, gameId)
 		if (gameIndex == -1) Promise.reject("Game not found")
 
-		games[gameIndex].ownerNumberOfConsecutiveWins += 1
-		games[gameIndex].ownerPoint += 1
-
-		if (games[gameIndex].ownerNumberOfConsecutiveWins >= 3) {
-			games[gameIndex].ownerNumberOfConsecutiveWins = 0
-			games[gameIndex].ownerPoint += 1
+		if (winner) {
+			if (winner === PlayerType.OWNER) {
+				return Promise.resolve(addGameOwnerPoint(games, gameIndex))
+			} else if (winner === PlayerType.CHALLENGER) {
+				games = addChallengerPoint(games, gameIndex)
+				return Promise.resolve(minusGameOwnerPoint(games, gameIndex))
+			} else {
+				throw "Unknown PlayerType"
+			}
+		} else {
+			return Promise.resolve(
+				resetGameOwnerNumberOfConsecutiveWins(games, gameIndex)
+			)
 		}
-
-		setGames(games)
-
-		return Promise.resolve(games[gameIndex])
-	},
-
-	minusGameOwnerPoint: (gameId: string): Promise<Game> => {
-		let games = findAllGames()
-		if (!games) Promise.reject("Game not found")
-
-		const gameIndex = findGameIndexById(games, gameId)
-		if (gameIndex == -1) Promise.reject("Game not found")
-
-		if (games[gameIndex].ownerPoint > 0) games[gameIndex].ownerPoint -= 1
-
-		setGames(games)
-
-		return Promise.resolve(games[gameIndex])
-	},
-
-	resetGameOwnerNumberOfConsecutiveWins: (gameId: string): Promise<Game> => {
-		let games = findAllGames()
-		if (!games) Promise.reject("Game not found")
-
-		const gameIndex = findGameIndexById(games, gameId)
-		if (gameIndex == -1) Promise.reject("Game not found")
-
-		games[gameIndex].ownerNumberOfConsecutiveWins = 0
-
-		setGames(games)
-
-		return Promise.resolve(games[gameIndex])
-	},
-
-	addChallengerPoint: (gameId: string): Promise<Game> => {
-		let games = findAllGames()
-		if (!games) Promise.reject("Game not found")
-
-		const gameIndex = findGameIndexById(games, gameId)
-		if (gameIndex == -1) Promise.reject("Game not found")
-
-		games[gameIndex].challengerPoint += 1
-		games[gameIndex].ownerNumberOfConsecutiveWins = 0
-
-		setGames(games)
-
-		return Promise.resolve(games[gameIndex])
 	},
 }

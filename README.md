@@ -37,8 +37,6 @@ If a GOOGLE_CLIENT_ID is not provided, the game will not require authentication,
 3. Check with winning combination every cell selected
 
 # Improvement target
-- Change get game setting by game id - Done
-- Unit testing
 - Responsive & decoration of History
 - AI Bot
 - Backend server integration with an SQLite database using NestJS

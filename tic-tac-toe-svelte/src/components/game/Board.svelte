@@ -113,7 +113,7 @@
 			const draw = isDraw(gameBoard!!)
 			if (draw) {
 				gameFreezed = true
-				dispatch("gameEnd")
+				dispatch("gameEnd", null)
 			} else {
 				currentMarkerType = switchMarker(currentMarkerType)
 				if (currentMarkerType === MarkerType.O) challengerTurn(gameBoard!!)

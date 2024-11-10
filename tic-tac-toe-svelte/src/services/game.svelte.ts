@@ -1,7 +1,5 @@
 import type { BotLevel } from "../bots/bot"
 import {
-	addChallengerPoint,
-	addGameOwnerPoint,
 	ChallengerType,
 	createGameByGameOwnerId,
 	createGameSettingByGameId,
@@ -11,12 +9,11 @@ import {
 	getGameSettingByGameId,
 	getRoundMarksByRoundId,
 	getRoundsByGameId,
-	minusGameOwnerPoint,
-	resetGameOwnerNumberOfConsecutiveWins,
+	processWinner,
 	setGameSettingById,
 	setWinnerByRoundId,
 	type Mark,
-	type Round,
+	type Round
 } from "../datasources/data-provider"
 
 export enum PlayerType {
@@ -76,20 +73,9 @@ export const setGameSetting = (
 
 export const processPoint = async (
 	gameId: string,
-	winner: PlayerType | undefined
+	winner: PlayerType | null
 ): Promise<GameResponse> => {
-	if (winner) {
-		if (winner === PlayerType.OWNER) {
-			return addGameOwnerPoint(gameId)
-		} else if (winner === PlayerType.CHALLENGER) {
-			await addChallengerPoint(gameId)
-			return minusGameOwnerPoint(gameId)
-		} else {
-			throw "Unknown PlayerType"
-		}
-	} else {
-		return resetGameOwnerNumberOfConsecutiveWins(gameId)
-	}
+	return processWinner(gameId, winner)
 }
 
 export const createRound = async (
