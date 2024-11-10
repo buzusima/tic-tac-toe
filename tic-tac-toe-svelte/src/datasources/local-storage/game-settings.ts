@@ -21,11 +21,11 @@ const findAllGameSettings = (): GameSetting[] => {
 	return []
 }
 
-const findGameSettingByGameOwnerId = (
+const findGameSettingByGameId = (
 	gameSettings: GameSetting[],
-	ownerId: string
+	gameId: string
 ): GameSetting | undefined =>
-	gameSettings.find((gameSetting) => gameSetting.ownerId == ownerId)
+	gameSettings.find((gameSetting) => gameSetting.gameId == gameId)
 
 const findGameSettingIndexById = (
 	gameSettings: GameSetting[],
@@ -33,19 +33,19 @@ const findGameSettingIndexById = (
 ): number => gameSettings.findIndex((gameSetting) => gameSetting.id == id)
 
 export const localGameSettingConnector: GameSettingDataProvider = {
-	getGameSettingByGameOwnerId: (ownerId: string): Promise<GameSetting> => {
+	getGameSettingByGameId: (gameId: string): Promise<GameSetting> => {
 		const gameSettings = findAllGameSettings()
 		if (!gameSettings)
 			return Promise.reject(new Error("Game setting not found"))
 
-		const gameSetting = findGameSettingByGameOwnerId(gameSettings, ownerId)
+		const gameSetting = findGameSettingByGameId(gameSettings, gameId)
 
 		if (gameSetting) return Promise.resolve(gameSetting)
 		else return Promise.reject(new Error("Game setting not found"))
 	},
 
-	createGameSettingByGameOwnerId: (
-		ownerId: string,
+	createGameSettingByGameId: (
+		gameId: string,
 		consecutiveTarget: number,
 		challengerType: ChallengerType,
 		botLevel: BotLevel,
@@ -56,7 +56,7 @@ export const localGameSettingConnector: GameSettingDataProvider = {
 
 		const newGameSetting: GameSetting = {
 			id: uuidv4(),
-			ownerId: ownerId,
+			gameId: gameId,
 			consecutiveTarget: consecutiveTarget,
 			challengerType: challengerType,
 			botLevel: botLevel,

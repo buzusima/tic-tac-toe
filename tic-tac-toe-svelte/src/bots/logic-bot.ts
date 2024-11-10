@@ -26,7 +26,6 @@ export const LogicBot: Bot = {
 				if (cell === MarkerType.EMPTY) emptyCells.push([rowIndex, colIndex])
 			})
 		})
-        console.log('asndksaj')
 		return emptyCells[Math.floor(Math.random() * emptyCells.length)]
 	},
 }

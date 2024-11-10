@@ -5,10 +5,19 @@ import { localGameRoundConnector } from "./local-storage/game-rounds"
 import { localGameSettingConnector } from "./local-storage/game-settings"
 import { localGameConnector } from "./local-storage/games"
 
+export interface GameDataProvider {
+	getGameByGameOwnerId: (ownerId: string) => Promise<Game>
+	createGameByGameOwnerId: (ownerId: string) => Promise<Game>
+	addGameOwnerPoint: (gameId: string) => Promise<Game>
+	minusGameOwnerPoint: (gameId: string) => Promise<Game>
+	resetGameOwnerNumberOfConsecutiveWins: (gameId: string) => Promise<Game>
+	addChallengerPoint: (gameId: string) => Promise<Game>
+}
+
 export interface GameSettingDataProvider {
-	getGameSettingByGameOwnerId: (ownerId: string) => Promise<GameSetting>
-	createGameSettingByGameOwnerId: (
-		ownerId: string,
+	getGameSettingByGameId: (gameId: string) => Promise<GameSetting>
+	createGameSettingByGameId: (
+		gameId: string,
 		consecutiveTarget: number,
 		challengerType: ChallengerType,
 		botLevel: BotLevel,
@@ -20,15 +29,6 @@ export interface GameSettingDataProvider {
 		botLevel: BotLevel,
 		gameSize: number
 	) => Promise<GameSetting>
-}
-
-export interface GameDataProvider {
-	getGameByGameOwnerId: (ownerId: string) => Promise<Game>
-	createGameByGameOwnerId: (ownerId: string) => Promise<Game>
-	addGameOwnerPoint: (gameId: string) => Promise<Game>
-	minusGameOwnerPoint: (gameId: string) => Promise<Game>
-	resetGameOwnerNumberOfConsecutiveWins: (gameId: string) => Promise<Game>
-	addChallengerPoint: (gameId: string) => Promise<Game>
 }
 
 export interface RoundDataProvider {
@@ -70,7 +70,7 @@ export interface Round {
 
 export interface GameSetting {
 	id: string
-	ownerId: string
+	gameId: string
 	consecutiveTarget: number
 	challengerType: ChallengerType
 	botLevel: number
@@ -92,17 +92,17 @@ const gameRoundConnector: RoundDataProvider = localGameRoundConnector
 const gameMarkConnector: MarkDataProvider = localGameRoundMarkConnector
 
 // -------------- Game Setting ----------------
-export const getGameSettingByGameOwnerId = (ownerId: string) =>
-	gameSettingConnector.getGameSettingByGameOwnerId(ownerId)
-export const createGameSettingByGameOwnerId = (
-	ownerId: string,
+export const getGameSettingByGameId = (gameId: string) =>
+	gameSettingConnector.getGameSettingByGameId(gameId)
+export const createGameSettingByGameId = (
+	gameId: string,
 	consecutiveTarget: number,
 	challengerType: ChallengerType,
 	botLevel: BotLevel,
 	gameSize: number
 ) =>
-	gameSettingConnector.createGameSettingByGameOwnerId(
-		ownerId,
+	gameSettingConnector.createGameSettingByGameId(
+		gameId,
 		consecutiveTarget,
 		challengerType,
 		botLevel,

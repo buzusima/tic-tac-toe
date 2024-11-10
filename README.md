@@ -37,11 +37,13 @@ If a GOOGLE_CLIENT_ID is not provided, the game will not require authentication,
 3. Check with winning combination every cell selected
 
 # Improvement target
-1. Bot
-1. Change get game setting by game id
-2. Fix createEventDispatcher deprecated
-3. Unit testing
-4. Backend server integration with an SQLite database
-5. Docker setup
-6. UI Improvements
+- Logic Bot
+- Change get game setting by game id
+- Responsive & decoration of History
+- Unit testing
+- AI Bot
+- Backend server integration with an SQLite database
+- Docker setup
+- UI Improvements
 
+- Fix createEventDispatcher deprecated

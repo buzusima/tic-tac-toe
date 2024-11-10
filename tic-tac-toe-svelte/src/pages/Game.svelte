@@ -26,9 +26,6 @@
 	let gameEnd = false
 	let winner = $state<PlayerType>()
 
-	let getGameSettingFunction = $state<Promise<GameSettingResponse>>()
-	let getGameFunction = $state<Promise<GameResponse>>()
-
 	let gameSetting = $state<GameSettingResponse>()
 	let game = $state<GameResponse>()
 	let currentRound = $state<Round>()
@@ -76,19 +73,14 @@
 		currentRound = event.detail as Round
 	}
 
-	$effect(() => {
-		if ($gameOwnerProfile) {
-			getGameFunction = getGame($gameOwnerProfile.reference)
-			getGameSettingFunction = getGameSetting($gameOwnerProfile.reference)
-		}
-	})
-
 	onMount(async () => {
-		try {
-			gameSetting = await getGameSettingFunction
-			game = await getGameFunction
-		} catch (error) {
-			console.error(error)
+		if ($gameOwnerProfile) {
+			try {
+				game = await getGame($gameOwnerProfile.reference)
+				gameSetting = await getGameSetting(game.id)
+			} catch (error) {
+				console.error(error)
+			}
 		}
 	})
 </script>
@@ -103,32 +95,28 @@
 	</div>
 {/if}
 <div class="game-panel-container">
-	{#await getGameFunction then}
-		{#await getGameSettingFunction then}
-			{#if game && gameSetting}
-				<div class="game-panel">
-					<div>
-						<div class="setting-contianer">
-							<GameSettings bind:gameSetting />
-						</div>
-						<GameStatus bind:gameSetting bind:game bind:winner />
-					</div>
-					<div class="board-container">
-						<Board
-							bind:this={board}
-							gameId={game.id}
-							bind:gameSetting
-							on:created={handleOnBoardCreated}
-							on:gameEnd={handleOnGameEnd}
-						/>
-					</div>
-					<div class="board-container">
-						<GameHistory bind:this={gameHistory} gameId={game.id} />
-					</div>
+	{#if game && gameSetting}
+		<div class="game-panel">
+			<div>
+				<div class="setting-contianer">
+					<GameSettings bind:gameSetting />
 				</div>
-			{/if}
-		{/await}
-	{/await}
+				<GameStatus bind:gameSetting bind:game bind:winner />
+			</div>
+			<div class="board-container">
+				<Board
+					bind:this={board}
+					gameId={game.id}
+					bind:gameSetting
+					on:created={handleOnBoardCreated}
+					on:gameEnd={handleOnGameEnd}
+				/>
+			</div>
+			<div class="history-container">
+				<GameHistory bind:this={gameHistory} gameId={game.id} />
+			</div>
+		</div>
+	{/if}
 </div>
 
 <style>
@@ -173,9 +161,10 @@
 
 			.board-container {
 				margin-top: 3rem;
-				/* height: 15rem;
-                width: 15rem;
-                display: flex; */
+			}
+
+			.history-container {
+				margin-top: 3rem;
 			}
 		}
 	}

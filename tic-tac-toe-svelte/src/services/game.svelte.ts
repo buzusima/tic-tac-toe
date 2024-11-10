@@ -4,11 +4,11 @@ import {
 	addGameOwnerPoint,
 	ChallengerType,
 	createGameByGameOwnerId,
-	createGameSettingByGameOwnerId,
+	createGameSettingByGameId,
 	createRoundByGameId,
 	createRoundMarkByRoundId,
 	getGameByGameOwnerId,
-	getGameSettingByGameOwnerId,
+	getGameSettingByGameId,
 	getRoundMarksByRoundId,
 	getRoundsByGameId,
 	minusGameOwnerPoint,
@@ -48,14 +48,14 @@ export const getGame = async (gameOwnerId: string): Promise<GameResponse> => {
 }
 
 export const getGameSetting = async (
-	gameOwnerId: string
+	gameId: string
 ): Promise<GameSettingResponse> => {
 	let gameSetting: GameSettingResponse
 	try {
-		gameSetting = await getGameSettingByGameOwnerId(gameOwnerId)
+		gameSetting = await getGameSettingByGameId(gameId)
 	} catch (error) {
-		gameSetting = await createGameSettingByGameOwnerId(
-			gameOwnerId,
+		gameSetting = await createGameSettingByGameId(
+			gameId,
 			DEFAULT_GAME_CONFIG.consecutiveTarget,
 			DEFAULT_GAME_CONFIG.challengerType,
 			DEFAULT_GAME_CONFIG.botLevel,
@@ -125,7 +125,7 @@ export const createRoundMark = (
 
 export interface GameSettingResponse {
 	id: string
-	ownerId: string
+	gameId: string
 	consecutiveTarget: number
 	challengerType: ChallengerType
 	botLevel: number
